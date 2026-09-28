@@ -1,10 +1,10 @@
 # First Safe Check
 
-Use this read-only check after connection or when the user asks what Desk Rules
+Use this read-only check after connection or when the user asks what Semlens
 can do.
 
 1. Inspect requested IDs with `inspect_mcp_capabilities` (bounded inventory
-   pages only). CLI: `deskrules mcp capabilities --operation <ids> --json`.
+   pages only). CLI: `semlens mcp capabilities --operation <ids> --json`.
 2. Run `inspect_mcp_authorization_status`; report static support separately
    from live availability.
 3. Run `inspect_rules` only when the workflow uses the Design Rule.

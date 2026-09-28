@@ -14,7 +14,7 @@ import {
   type StoredOAuthTokens,
 } from "@modelcontextprotocol/client"
 import open from "open"
-import { DESK_RULES_MCP_SERVER_MANIFEST } from "./manifest.js"
+import { SEMLENS_MCP_SERVER_MANIFEST } from "./manifest.js"
 import { assertSafeDiscoveryState, assertSafeOAuthUrl } from "./oauth-session-safety.js"
 import {
   ProtectedCredentialStore,
@@ -92,8 +92,8 @@ export class ProtectedOAuthProvider implements OAuthClientProvider {
   get clientMetadata(): OAuthClientMetadata {
     return {
       application_type: "native",
-      client_name: "Desk Rules CLI",
-      client_uri: "https://deskrules.com/docs/mcp",
+      client_name: "Semlens CLI",
+      client_uri: "https://semlens.com/docs/mcp",
       grant_types: ["authorization_code", "refresh_token"],
       redirect_uris: [this.redirectUrl],
       response_types: ["code"],
@@ -246,8 +246,8 @@ function respond(response: import("node:http").ServerResponse, status: number) {
   })
   response.end(
     status === 200
-      ? "<!doctype html><title>Desk Rules authorized</title><p>Authorization complete. You can close this window.</p>"
-      : "<!doctype html><title>Desk Rules authorization failed</title><p>Authorization could not be completed. Return to the terminal.</p>",
+      ? "<!doctype html><title>Semlens authorized</title><p>Authorization complete. You can close this window.</p>"
+      : "<!doctype html><title>Semlens authorization failed</title><p>Authorization could not be completed. Return to the terminal.</p>",
   )
 }
 
@@ -317,7 +317,7 @@ export async function createLoopbackCallbackReceiver(input: {
 
 function createMcpClient() {
   return new Client(
-    { name: "desk-rules-cli", version: DESK_RULES_MCP_SERVER_MANIFEST.cli.currentVersion },
+    { name: "semlens-cli", version: SEMLENS_MCP_SERVER_MANIFEST.cli.currentVersion },
     {
       capabilities: {},
       versionNegotiation: { mode: "auto", probe: { maxRetries: 0 } },

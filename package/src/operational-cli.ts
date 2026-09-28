@@ -10,7 +10,7 @@ import {
   OperationalMcpError,
   readToolInput,
 } from "./operational-mcp.js"
-import { DESK_RULES_MCP_SERVER_MANIFEST } from "./manifest.js"
+import { SEMLENS_MCP_SERVER_MANIFEST } from "./manifest.js"
 import { CliImageFileError } from "./image-files.js"
 import {
   inspectFeedbackStatus,
@@ -243,7 +243,7 @@ function parseOperationalFlags(
 ): ParsedOperationalFlags {
   const { booleans, values } = collectOperationalFlags(argv, allowedFlags)
   const endpointInput =
-    values.get("endpoint") ?? DESK_RULES_MCP_SERVER_MANIFEST.canonicalEndpoint
+    values.get("endpoint") ?? SEMLENS_MCP_SERVER_MANIFEST.canonicalEndpoint
   const endpoint = parseSafeMcpUrl(endpointInput, { allowLocalHttp: true })
   if (!endpoint) throw new OperationalMcpError("input_invalid")
   const outputDirectory = readOptionalFlag(values, "output-directory")
@@ -398,7 +398,7 @@ function printResult(value: Record<string, unknown>, json: boolean) {
     process.stdout.write(`${JSON.stringify(value)}\n`)
     return
   }
-  process.stdout.write("Desk Rules CLI\n")
+  process.stdout.write("Semlens CLI\n")
   for (const [key, item] of Object.entries(value)) {
     process.stdout.write(
       `${key}: ${typeof item === "string" ? item : JSON.stringify(item)}\n`,

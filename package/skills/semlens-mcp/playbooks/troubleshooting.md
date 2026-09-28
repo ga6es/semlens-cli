@@ -8,17 +8,22 @@
 3. For stale Research writes, reinspect the story research and copy the
    refreshed `expectedUpdatedAt`, `packageFingerprint`, and `freshnessToken`
    into one complete `save_news_board_story_research` request.
-4. For setup or bundle problems, use the Desk Rules plugin or the currently
+4. For setup or bundle problems, use the Semlens plugin or the currently
    published CLI doctor from the release notes.
-5. For Codex configuration, preview `deskrules mcp repair codex` and apply only
+5. For Codex configuration, preview `semlens mcp repair codex` and apply only
    after reviewing the bounded plan. The starter profile is the default; full
    discovery requires explicit `--profile full`.
-6. Install the Desk Rules plugin or configure the hosted MCP server manually.
+6. Install the Semlens plugin or configure the hosted MCP server manually.
    These are alternative setup methods, not additive requirements.
 
 If a removed operation returns unknown-tool, update the CLI/plugin/skill bundle
-and reconnect so the client rediscovers the current manifest. Desk Rules cannot
+and reconnect so the client rediscovers the current manifest. Semlens cannot
 rename host-generated callable aliases or remove separately configured client
 namespaces.
 
 Never ask for tokens, client secrets, full config files, or raw backups.
+
+Publishing connection setup and reconnection are currently unavailable. Do not
+direct users to Apps or start provider OAuth setup. Preserve completed work and
+stop when a publishing connection is required; do not loop retries or bypass
+provider readiness checks.

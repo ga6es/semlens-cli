@@ -1,4 +1,4 @@
-name: Publish Desk Rules CLI
+name: Publish Semlens CLI
 
 on:
   workflow_dispatch:
@@ -11,6 +11,14 @@ on:
         options:
           - "true"
           - "false"
+      authentication:
+        description: Registry authentication (bootstrap requires separate approval)
+        required: true
+        default: trusted
+        type: choice
+        options:
+          - trusted
+          - bootstrap
 
 permissions:
   contents: read
@@ -22,10 +30,18 @@ concurrency:
 
 jobs:
   publish:
-    name: Publish @desk-rules/cli
+    name: Publish @semlens/cli
     environment: npm
     runs-on: ubuntu-latest
     steps:
+      - name: Validate publication inputs
+        env:
+          AUTHENTICATION: ${{ inputs.authentication }}
+          DRY_RUN: ${{ inputs.dry_run }}
+        run: |
+          case "$AUTHENTICATION" in trusted|bootstrap) ;; *) exit 1 ;; esac
+          case "$DRY_RUN" in true|false) ;; *) exit 1 ;; esac
+
       - name: Checkout
         uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
 
@@ -49,10 +65,10 @@ jobs:
         run: npm run build && npm test && npm run check:package
 
       - name: Inspect package tarball
-        run: npm pack --dry-run --json --workspace @desk-rules/cli > npm-pack.json
+        run: npm pack --dry-run --json --workspace @semlens/cli > npm-pack.json
 
       - name: Generate CycloneDX SBOM
-        run: npm run sbom --silent > desk-rules-cli.cdx.json
+        run: npm run sbom --silent > semlens-cli.cdx.json
 
       - name: Upload release evidence
         uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
@@ -60,13 +76,43 @@ jobs:
           name: desk-rules-cli-release-evidence
           path: |
             npm-pack.json
-            desk-rules-cli.cdx.json
+            semlens-cli.cdx.json
           if-no-files-found: error
 
-      - name: Publish package
+      - name: Publish through trusted publisher
+        if: inputs.authentication == 'trusted'
         run: |
           if [ "${{ inputs.dry_run }}" = "true" ]; then
-            npm publish --workspace @desk-rules/cli --access public --provenance --dry-run
+            npm publish --workspace @semlens/cli --access public --provenance --dry-run
           else
-            npm publish --workspace @desk-rules/cli --access public --provenance
+            npm publish --workspace @semlens/cli --access public --provenance
           fi
+
+      - name: Bootstrap first publication
+        if: inputs.authentication == 'bootstrap'
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_BOOTSTRAP_TOKEN }}
+          DRY_RUN: ${{ inputs.dry_run }}
+        run: |
+          node --input-type=module <<'NODE'
+          import { readFileSync } from 'node:fs';
+          import { spawnSync } from 'node:child_process';
+          const metadata = JSON.parse(readFileSync('package/package.json', 'utf8'));
+          if (metadata.name !== '@semlens/cli' || metadata.version !== '0.5.0') {
+            throw new Error('Bootstrap requires @semlens/cli@0.5.0.');
+          }
+          if (!process.env.NODE_AUTH_TOKEN) throw new Error('Approved bootstrap credential is missing.');
+          if (!['true', 'false'].includes(process.env.DRY_RUN)) throw new Error('Invalid dry-run input.');
+          const registry = 'https://registry.npmjs.org';
+          const lookup = spawnSync('npm', ['view', metadata.name, '--registry', registry, '--json'], { encoding: 'utf8' });
+          let result;
+          try { result = JSON.parse(lookup.stdout); } catch { throw new Error('Registry lookup did not return structured evidence.'); }
+          if (lookup.status === 0 || lookup.error || lookup.status === null || result?.error?.code !== 'E404') {
+            throw new Error('Bootstrap requires an explicit package-not-found registry response.');
+          }
+          const args = ['publish', '--workspace', '@semlens/cli', '--registry', registry, '--access', 'public', '--provenance'];
+          if (process.env.DRY_RUN === 'true') args.push('--dry-run');
+          const publish = spawnSync('npm', args, { stdio: 'inherit' });
+          if (publish.error || publish.status === null) throw new Error('Publication command could not complete.');
+          process.exit(publish.status);
+          NODE

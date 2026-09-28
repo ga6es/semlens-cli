@@ -1,50 +1,50 @@
-# Desk Rules CLI
+# Semlens CLI
 
-`@desk-rules/cli` provides authenticated Desk Rules MCP execution, setup,
-diagnostics, repair, update checks, and the current skill bundle. Desk Rules
+`@semlens/cli` provides authenticated Semlens MCP execution, setup,
+diagnostics, repair, update checks, and the current skill bundle. Semlens
 MCP itself is hosted at:
 
 ```text
-https://agents.deskrules.com/api/mcp
+https://agents.semlens.com/api/mcp
 ```
 
 ## Quick use
 
 ```bash
-deskrules mcp doctor
-deskrules mcp doctor --client codex
-deskrules mcp repair codex
-deskrules mcp setup codex
-deskrules mcp setup codex --profile full
-deskrules mcp setup claude
-deskrules auth login
-deskrules auth status --json
-deskrules mcp capabilities --operation inspect_brand_kit,inspect_uploaded_assets --json
-deskrules mcp call inspect_brand_kit --input '{}'
-deskrules mcp call inspect_uploaded_asset_identities --input '{"assetIds":["<upload-id>"]}'
-deskrules media upload --file ./logo.png --request-id 11111111-1111-4111-8111-111111111111 --approve-write
-deskrules media upload --batch-file ./media-uploads.json --approve-write
-deskrules mcp call import_uploaded_assets_from_urls --input-file remote-media.json --approve-external
-deskrules brand upload --kind logo --label "Primary logo" --file ./logo.png --request-id <uuid> --approve-write
-deskrules feedback submit --summary "Export freezes after save" --report-file ./feedback.txt --request-id <uuid> --attachment-file ./screen.png --approve-write
-deskrules feedback status --request-id <uuid> --json
-deskrules mcp call inspect_design_resource_preview --input '{"kind":"logo","id":"<logo-id>"}' --output-file logo-preview.jpg
-deskrules mcp call inspect_design_page_preview --input-file page-previews.json --output-directory ./previews
-deskrules mcp call inspect_design_asset_crop --input-file crop-preview.json --output-file crop-preview.jpg
-deskrules studio reference upload --file ./reference.webp --request-id <uuid> --approve-write
-deskrules mcp call retrieve_studio_output_content --input '{"outputId":"<uuid>"}' --output-file result.webp
-deskrules mcp call update_design_text --input-file request.json --approve-write
-deskrules mcp call publish_design --input-file request.json --approve-external
-deskrules skills list
+semlens mcp doctor
+semlens mcp doctor --client codex
+semlens mcp repair codex
+semlens mcp setup codex
+semlens mcp setup codex --profile full
+semlens mcp setup claude
+semlens auth login
+semlens auth status --json
+semlens mcp capabilities --operation inspect_brand_kit,inspect_uploaded_assets --json
+semlens mcp call inspect_brand_kit --input '{}'
+semlens mcp call inspect_uploaded_asset_identities --input '{"assetIds":["<upload-id>"]}'
+semlens media upload --file ./logo.png --request-id 11111111-1111-4111-8111-111111111111 --approve-write
+semlens media upload --batch-file ./media-uploads.json --approve-write
+semlens mcp call import_uploaded_assets_from_urls --input-file remote-media.json --approve-external
+semlens brand upload --kind logo --label "Primary logo" --file ./logo.png --request-id <uuid> --approve-write
+semlens feedback submit --summary "Export freezes after save" --report-file ./feedback.txt --request-id <uuid> --attachment-file ./screen.png --approve-write
+semlens feedback status --request-id <uuid> --json
+semlens mcp call inspect_design_resource_preview --input '{"kind":"logo","id":"<logo-id>"}' --output-file logo-preview.jpg
+semlens mcp call inspect_design_page_preview --input-file page-previews.json --output-directory ./previews
+semlens mcp call inspect_design_asset_crop --input-file crop-preview.json --output-file crop-preview.jpg
+semlens studio reference upload --file ./reference.webp --request-id <uuid> --approve-write
+semlens mcp call retrieve_studio_output_content --input '{"outputId":"<uuid>"}' --output-file result.webp
+semlens mcp call update_design_text --input-file request.json --approve-write
+semlens mcp call publish_design --input-file request.json --approve-external
+semlens skills list
 ```
 
 Codex setup uses the restricted starter profile by default. Full tool discovery
 requires explicit `--profile full`. Repair is dry-run by default and changes
-only one unambiguous remote Desk Rules block when rerun with `--apply`.
+only one unambiguous remote Semlens block when rerun with `--apply`.
 
-Install the Desk Rules plugin or configure the hosted server manually. They are
+Install the Semlens plugin or configure the hosted server manually. They are
 alternative setup methods, not additive requirements. The CLI does not install
-skills into host-specific folders or grant Desk Rules write authorization.
+skills into host-specific folders or grant Semlens write authorization.
 
 Operational commands use OAuth PKCE and the same registered MCP tools as
 connected agents. Windows credentials are stored in Windows Credential Manager;
@@ -57,7 +57,7 @@ committed session until the replacement is verified. A keyring failure during
 the final protected-store commit can leave its outcome uncertain; rerun
 `auth status` before retrying login. A corrupt credential manifest fails closed rather than guessing which entries to
 delete. If logout reports `credential_store_corrupt`, use Windows Credential
-Manager to remove only the affected Desk Rules CLI entries; do not clear other
+Manager to remove only the affected Semlens CLI entries; do not clear other
 applications' credentials. Native keyring recovery and hosted OAuth still require
 environment-specific verification; the automated lifecycle checks use fixtures.
 Remote OAuth discovery accepts named HTTPS hosts, not IP literals or local
@@ -78,7 +78,7 @@ array of up to eight `{ "file": "...", "requestId": "<uuid>" }` items;
 the per-file and aggregate limit is 50 MiB. Reuse the same request ID for an
 uncertain retry, and do not reuse it for different input.
 
-Brand uploads use `deskrules brand upload` and the same authenticated streaming
+Brand uploads use `semlens brand upload` and the same authenticated streaming
 boundary as media uploads. Each item declares `kind` (`logo` or `font`), a
 human-readable `label`, a stable `requestId`, and a local `file`. Brand logo
 files are capped at 25 MiB, font files at 10 MiB, and a batch at 25 MiB. The
@@ -114,7 +114,7 @@ submission and reports delivery as `queued`, `processing`, `dispatched`,
 `retryable`, `uncertain`, or `failed`. If the command stops after a partial
 upload or delivery becomes uncertain, rerun with the same request UUID and
 files, then use `feedback status`; never invent a new UUID for the same attempt.
-Private evidence remains in Desk Rules private storage and only the bounded
+Private evidence remains in Semlens private storage and only the bounded
 summary, reporter context, and evidence count are mirrored to Trello.
 
 Native MCP preview images can be saved with one explicit `--output-file` or a
@@ -141,10 +141,11 @@ Draft version fence, and returns native image content only when
 
 ## Compatibility
 
-- Current CLI contract: `0.5.0` (prepared; published package remains `0.2.4`)
-- Minimum compatible CLI contract: `0.2.2`
+- Current Semlens CLI contract: `0.5.0` (prepared; `@semlens/cli` is unpublished)
+- Historical Desk Rules package: `@desk-rules/cli` version `0.2.4`
+- Minimum compatible CLI contract: `0.5.0`
 - Current plugin and bundled skill contract: `0.5.0`
-- MCP manifest: `2026-09-22.agent-draft-recovery`
+- MCP manifest: `2026-09-26.semlens-identity`
 - Protocol: MCP `2026-07-28` with automatic stateless legacy fallback
 
 Run `mcp doctor` when a server, plugin, CLI, or skill bundle looks stale. The
@@ -154,7 +155,7 @@ changing account authorization.
 
 ## Workflow boundary
 
-Desk Rules MCP owns authorization, private workspace inspection, research
+Semlens MCP owns authorization, private workspace inspection, research
 persistence, template validation, editable design operations, export, and
 publication preparation. The connected agent supplies its own permitted public
 web, search, or browser tools. Account > Agent > Design Rule remains the
@@ -166,10 +167,15 @@ identifiers. Existing-design multi-step edits use Agent Draft; direct editor
 commands remain available for explicit one-step edits. Publishing always
 requires explicit approval for the exact publication.
 
+Publishing connection setup and reconnection are currently unavailable. Do not
+direct users to Apps or start provider OAuth setup. Preserve completed work and
+stop when a connection is required. Existing ready connections still require
+current authorization and approval for the specific publication.
+
 Studio generation and edit parity is a full-profile surface. The Codex plugin
 keeps the restricted starter allowlist; use authenticated operational CLI
 commands, or use the alternative manual setup with
-`deskrules mcp setup codex --profile full`. Do not configure the plugin and a
+`semlens mcp setup codex --profile full`. Do not configure the plugin and a
 manual connection to the same hosted endpoint together.
 
 ## Safety and source
@@ -182,6 +188,6 @@ manual connection to the same hosted endpoint together.
 - Configuration/profile changes never grant account write access.
 
 The CLI and bundled skills are licensed under the Apache License 2.0. Release
-source is published at https://github.com/ga6es/desk-rules-cli. This license
-does not apply to the hosted Desk Rules service or its source code and does not
-grant trademark rights in the Desk Rules name.
+source is published at https://github.com/ga6es/semlens-cli. This license
+does not apply to the hosted Semlens service or its source code and does not
+grant trademark rights in the Semlens name.

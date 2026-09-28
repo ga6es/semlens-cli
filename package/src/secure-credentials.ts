@@ -8,7 +8,7 @@ import type {
   StoredOAuthTokens,
 } from "@modelcontextprotocol/client"
 
-const CREDENTIAL_SERVICE = "com.deskrules.cli.oauth"
+const CREDENTIAL_SERVICE = "com.semlens.cli.oauth"
 const MAX_SESSION_BYTES = 64 * 1024
 const PROTECTED_CHUNK_BYTES = 720
 const MAX_PROTECTED_CHUNKS = 96
@@ -544,7 +544,7 @@ function removeStaleLock(path: string) {
 }
 
 function acquireEndpointLock(endpoint: string) {
-  const path = join(tmpdir(), `deskrules-cli-${endpointKey(endpoint)}.lock`)
+  const path = join(tmpdir(), `semlens-cli-${endpointKey(endpoint)}.lock`)
   const recoveryPath = `${path}.recovery`
   let recoveryDescriptor: number | null = null
   try {
