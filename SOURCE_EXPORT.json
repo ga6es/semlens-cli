@@ -58,7 +58,7 @@
     },
     {
       "path": "package/README.md",
-      "sha256": "64dfcb50946ced9ff28826e95ae8cfc76443ed2ab3dd40ef30f613ab1c8dd59c"
+      "sha256": "23baaa61e328ff4729ff674bb34ca19ada30d574b9700ae032c71e4af553ce36"
     },
     {
       "path": "package/package.json",
@@ -170,7 +170,7 @@
     },
     {
       "path": "tests/cli.test.ts",
-      "sha256": "20f6aea883cd65bf4af59380e7d2de27b5054619fc03ff1aa8f60869f07f5b2b"
+      "sha256": "4d62c859d93fab077a93d0f498c300b94ec33b24f07597e16eadaec2ac480153"
     },
     {
       "path": "tests/deny-keyring-loader.mjs",
@@ -179,7 +179,7 @@
   ],
   "schemaVersion": 1,
   "source": {
-    "commit": "b2ea1dd966981a179b3e3d6681f513e1c9be8cd7",
+    "commit": "de8e24920323f979313c6ab54180509b46db60d7",
     "repository": "ga6es/semlens",
     "root": "packages/cli"
   }

@@ -100,10 +100,17 @@ test("built CLI reports its offline compatibility and bundled skill", async () =
       .currentSkillsVersion as string
   const doctor = spawnSync(
     process.execPath,
-    ["package/dist/index.js", "mcp", "doctor", "--offline"],
+    ["package/dist/index.js", "mcp", "doctor", "--offline", "--json"],
     { encoding: "utf8" },
   )
   assert.equal(doctor.status, 0, doctor.stderr)
+  const report = JSON.parse(doctor.stdout)
+  assert.equal(report.endpoint, canonicalEndpoint)
+  assert.equal(report.expectedManifestVersion, manifestModule.SEMLENS_MCP_SERVER_MANIFEST.manifestVersion)
+  assert.deepEqual(report.protocolCompatibility, manifestModule.SEMLENS_MCP_SERVER_MANIFEST.protocolCompatibility)
+  assert.equal(report.checks.find((check: { name: string }) => check.name === "CLI version")?.status, "pass")
+  assert.equal(report.checks.find((check: { name: string }) => check.name === "live metadata")?.status, "warn")
+  assert.ok(report.checks.every((check: { status: string }) => check.status !== "fail"))
 
   const skills = spawnSync(
     process.execPath,
@@ -121,6 +128,33 @@ test("built CLI reports its offline compatibility and bundled skill", async () =
     encoding: "utf8",
   })
   assert.equal(help.status, 0, help.stderr)
+})
+
+test("offline doctor rejects a CLI contract below the server minimum", () => {
+  const doctor = spawnSync(
+    process.execPath,
+    ["package/dist/index.js", "mcp", "doctor", "--offline", "--json", "--cli-version", "0.0.0"],
+    { encoding: "utf8" },
+  )
+  assert.equal(doctor.status, 1, doctor.stderr)
+  const report = JSON.parse(doctor.stdout)
+  assert.equal(report.checks.find((check: { name: string }) => check.name === "CLI version")?.status, "fail")
+})
+
+test("login and generic-call dispatch reject malformed input before credentials or network", () => {
+  const loaderUrl = new URL("./deny-keyring-loader.mjs", import.meta.url).href
+  for (const command of [
+    ["auth", "login", "--endpoint", "not-a-url", "--json"],
+    ["mcp", "call", "--json"],
+  ]) {
+    const result = spawnSync(
+      process.execPath,
+      ["--experimental-loader", loaderUrl, "package/dist/index.js", ...command],
+      { encoding: "utf8" },
+    )
+    assert.equal(result.status, 1, result.stderr)
+    assert.deepEqual(JSON.parse(result.stdout), { code: "input_invalid", ok: false })
+  }
 })
 
 test("legacy commands do not load the optional native credential backend", () => {
