@@ -58,7 +58,7 @@
     },
     {
       "path": "package/README.md",
-      "sha256": "23baaa61e328ff4729ff674bb34ca19ada30d574b9700ae032c71e4af553ce36"
+      "sha256": "ddc25e624e7dac446288a664071cb8e9dbd3b7485914ac11c488835542ae051b"
     },
     {
       "path": "package/package.json",
@@ -162,7 +162,7 @@
     },
     {
       "path": "scripts/check-package.mjs",
-      "sha256": "51b93a68e21f79330887fbce079876168108fefc7cb05748a84c024210ac49f9"
+      "sha256": "66fe980987064ffcff749c4d951c4c8de262e1e9fad583d00bea5a2673443cce"
     },
     {
       "path": "scripts/verify-export.mjs",
@@ -179,7 +179,7 @@
   ],
   "schemaVersion": 1,
   "source": {
-    "commit": "c4065c8bc6356647727db4be08f3a076bb866e78",
+    "commit": "c71fd989d7db86c55b527488985d8f40b08647e7",
     "repository": "ga6es/desk-rules",
     "root": "packages/cli"
   }
