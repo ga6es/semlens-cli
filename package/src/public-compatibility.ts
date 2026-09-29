@@ -3,17 +3,17 @@
  * Keep this module dependency-free so the public CLI export can consume it
  * without importing application source.
  */
-export const DESK_RULES_PUBLIC_COMPATIBILITY = {
-  canonicalEndpoint: "https://agents.deskrules.com/api/mcp",
+export const SEMLENS_PUBLIC_COMPATIBILITY = {
+  canonicalEndpoint: "https://agents.semlens.com/api/mcp",
   clientProfiles: {
     default: {
       description:
-        "Use the manifest-generated starter tool set for common Desk Rules workflows.",
+        "Use the manifest-generated starter tool set for common Semlens workflows.",
       id: "starter",
       toolDiscovery: "starter_profile",
     },
     full: {
-      description: "Explicitly discover every registered Desk Rules MCP tool.",
+      description: "Explicitly discover every registered Semlens MCP tool.",
       id: "full",
       toolDiscovery: "all_registered",
     },
@@ -25,12 +25,12 @@ export const DESK_RULES_PUBLIC_COMPATIBILITY = {
       endpointChange:
         "Reconnect the MCP client after changing the endpoint. The client may require OAuth authentication for the canonical endpoint.",
       permissionInvariant:
-        "Tool discovery never grants write access. Desk Rules access, workflow permissions, billing, ownership, provider requirements, and client approval still govern mutations.",
+        "Tool discovery never grants write access. Semlens access, workflow permissions, billing, ownership, provider requirements, and client approval still govern mutations.",
     },
     updateContract:
       "CLI, plugins, skills, docs, smoke tests, and Account UI consume the public compatibility contract instead of inventing release metadata.",
   },
-  manifestVersion: "2026-09-22.agent-draft-recovery",
+  manifestVersion: "2026-09-26.semlens-identity",
   profiles: {
     starterTools: [
       "inspect_mcp_capabilities",
@@ -113,25 +113,25 @@ export const DESK_RULES_PUBLIC_COMPATIBILITY = {
       status: "deferred",
     },
   },
-  serverName: "desk-rules-mcp",
+  serverName: "semlens-mcp",
   versions: {
     cli: {
       current: "0.5.0",
-      minimumCompatible: "0.2.2",
-      published: "0.2.4",
+      minimumCompatible: "0.5.0",
+      published: "",
     },
     plugin: {
       current: "0.5.0",
-      minimumCompatible: "0.2.2",
+      minimumCompatible: "0.5.0",
     },
     skills: {
       current: "0.5.0",
-      minimumCompatible: "0.2.2",
+      minimumCompatible: "0.5.0",
     },
   },
 } as const
 
-export function isDeskRulesPublicCliSetupAvailable(input: {
+export function isSemlensPublicCliSetupAvailable(input: {
   currentVersion: string
   publishedVersion: string
 }) {

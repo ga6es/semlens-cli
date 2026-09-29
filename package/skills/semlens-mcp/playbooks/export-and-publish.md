@@ -1,7 +1,7 @@
 # Export And Publishing Readiness
 
 Use this playbook when a user wants files, downloads, or social publishing from
-Desk Rules MCP.
+Semlens MCP.
 
 ## Export
 
@@ -13,10 +13,15 @@ Desk Rules MCP.
 5. Explain format, eligibility, limits, and expected output.
 6. If the user's request already authorizes that exact export, call
    `create_design_export`; otherwise ask before creating it.
-7. Treat the returned artifact as the final synchronous result. Desk Rules does
+7. Treat the returned artifact as the final synchronous result. Semlens does
    not advertise a durable task handle, task status, or task cancellation.
 
 ## Publishing
+
+Connection setup and reconnection are currently unavailable. Do not direct
+users to Apps or start provider OAuth setup. Preserve completed work and stop
+when a publishing connection is required. The steps below apply only to an
+existing ready connection; they do not grant access or publication approval.
 
 1. Confirm `inspect_mcp_authorization_status` reports Publish available.
 2. If it is unavailable, preserve completed work, explain the returned blocker,

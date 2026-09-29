@@ -15,7 +15,7 @@ if (manifest.schemaVersion !== 1 || !Array.isArray(manifest.files)) {
 
 const ignoredRoots = new Set([".git", "node_modules"])
 const ignoredGenerated = new Set([
-  "desk-rules-cli.cdx.json",
+  "semlens-cli.cdx.json",
   "npm-pack.json",
 ])
 

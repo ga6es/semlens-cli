@@ -1,11 +1,11 @@
 ---
-name: desk-rules-mcp
-description: Operate Desk Rules MCP for authorization, the Design Rule, Board research, editable design creation and editing, export, and publication preparation.
+name: semlens-mcp
+description: Operate Semlens MCP for authorization, the Design Rule, Board research, editable design creation and editing, export, and publication preparation.
 ---
 
-# Desk Rules MCP
+# Semlens MCP
 
-Use the hosted endpoint `https://agents.deskrules.com/api/mcp`.
+Use the hosted endpoint `https://agents.semlens.com/api/mcp`.
 
 ## Authority
 
@@ -18,6 +18,10 @@ Use the hosted endpoint `https://agents.deskrules.com/api/mcp`.
   and duplicate namespaces remain client-owned.
 - CLI auth and tool execution never bypass MCP account, owner, workflow,
   freshness, audit, billing, or provider checks.
+- Publishing connection setup and reconnection are currently unavailable.
+  Do not direct users to Apps or start a provider connection workflow. Preserve
+  completed work and stop when a connection is required. Existing ready
+  connections still require current authorization and specific publication approval.
 
 ## Research
 
@@ -59,13 +63,13 @@ Do not send retired `images`, `imageCandidates`, `imageFill`,
 `imageCandidateId`, or `mediaCandidateId`; use uploaded media, Studio
 generation, or editor image tools separately after `research_images_retired`.
 Use only accessible evidence,
-never send private Desk Rules context to external services, and never fabricate
+never send private Semlens context to external services, and never fabricate
 sources.
 
 ## Uploads Ingestion
 
 - Local media: run
-  `deskrules media upload --file <path> --request-id <uuid> --approve-write`.
+  `semlens media upload --file <path> --request-id <uuid> --approve-write`.
   The path stays in the CLI; MCP receives basename, size, hash, and a stable
   request ID before authenticated byte transfer. Batch files contain up to
   eight `file`/`requestId` items.
@@ -80,7 +84,7 @@ sources.
 
 ## Brand Asset Ingestion
 
-- Local: `deskrules brand upload --kind <logo|font> --label <label> --file
+- Local: `semlens brand upload --kind <logo|font> --label <label> --file
 <path> --request-id <uuid> --approve-write`. Paths stay local; batches allow
   eight items.
 - Limits: logo 25 MiB; font 10 MiB; batch 25 MiB.
@@ -95,7 +99,7 @@ sources.
   `inspect_workspace_feedback_status` capability and live authorization before
   writing. Feedback uses normal account, master-write, audit, and per-call
   approval gates but consumes zero AI credits.
-- CLI: `deskrules feedback submit --summary <text> --report-file <path>
+- CLI: `semlens feedback submit --summary <text> --report-file <path>
 --request-id <uuid> --approve-write`. The full UTF-8 report is preserved up
   to 64 KiB. Add one `--attachment-file` or an `--attachments-file` JSON array
   of up to eight paths or `file`/`requestId` records.

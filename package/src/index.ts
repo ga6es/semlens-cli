@@ -13,8 +13,8 @@ import {
   type CodexConfigRepairPlan,
 } from "./codex-config-repair.js"
 import {
-  DESK_RULES_MCP_STARTER_PROFILE_TOOL_NAMES,
-  DESK_RULES_MCP_SERVER_MANIFEST,
+  SEMLENS_MCP_STARTER_PROFILE_TOOL_NAMES,
+  SEMLENS_MCP_SERVER_MANIFEST,
 } from "./manifest.js"
 import { inspectAuthorizationServerMetadata } from "./oauth-metadata.js"
 import { parseSafeMcpUrl } from "./safe-mcp-url.js"
@@ -45,7 +45,7 @@ type CodexSetupArgs = {
 }
 
 const DEFAULT_TIMEOUT_MS = 10_000
-const PUBLIC_DOCS_ORIGIN = "https://deskrules.com"
+const PUBLIC_DOCS_ORIGIN = "https://semlens.com"
 const DOCS_PATH = "/docs/mcp"
 const PROMPT_DOCS_PATH = "/docs/mcp/prompt.md"
 
@@ -62,7 +62,7 @@ function readCurrentCliVersion() {
     typeof packageMetadata.version !== "string" ||
     !/^\d+\.\d+\.\d+$/.test(packageMetadata.version)
   ) {
-    throw new Error("The Desk Rules CLI package version is invalid.")
+    throw new Error("The Semlens CLI package version is invalid.")
   }
 
   return packageMetadata.version
@@ -71,9 +71,9 @@ function readCurrentCliVersion() {
 const CURRENT_CLI_VERSION = readCurrentCliVersion()
 const BUNDLED_SKILLS = [
   {
-    name: "desk-rules-mcp",
-    packagePath: "skills/desk-rules-mcp",
-    version: DESK_RULES_MCP_SERVER_MANIFEST.compatibility.currentSkillsVersion,
+    name: "semlens-mcp",
+    packagePath: "skills/semlens-mcp",
+    version: SEMLENS_MCP_SERVER_MANIFEST.compatibility.currentSkillsVersion,
   },
 ] as const
 
@@ -212,7 +212,7 @@ function parseCodexSetupArgs(argv: readonly string[]): CodexSetupArgs {
 function readEndpoint(flags: Map<string, string | true>) {
   return (
     readFlag(flags, "endpoint") ??
-    DESK_RULES_MCP_SERVER_MANIFEST.canonicalEndpoint
+    SEMLENS_MCP_SERVER_MANIFEST.canonicalEndpoint
   )
 }
 
@@ -324,17 +324,17 @@ function addDoctorVersionChecks(
     [
       "CLI",
       readFlag(flags, "cli-version") ?? CURRENT_CLI_VERSION,
-      DESK_RULES_MCP_SERVER_MANIFEST.compatibility.minimumCliVersion,
+      SEMLENS_MCP_SERVER_MANIFEST.compatibility.minimumCliVersion,
     ],
     [
       "Plugin",
       readFlag(flags, "plugin-version"),
-      DESK_RULES_MCP_SERVER_MANIFEST.compatibility.minimumPluginVersion,
+      SEMLENS_MCP_SERVER_MANIFEST.compatibility.minimumPluginVersion,
     ],
     [
       "Skills",
       readFlag(flags, "skills-version"),
-      DESK_RULES_MCP_SERVER_MANIFEST.compatibility.minimumSkillsVersion,
+      SEMLENS_MCP_SERVER_MANIFEST.compatibility.minimumSkillsVersion,
     ],
   ] as const) {
     addVersionCheck(checks, label, actual, minimum)
@@ -417,7 +417,7 @@ function addAuthorizationMetadataChecks(
     {
       message: auth.issuerMatches
         ? "Authorization-server metadata issuer matches protected-resource discovery."
-        : "Authorization-server issuer changed or does not match. Reconnect Desk Rules MCP instead of reusing cached client registration.",
+        : "Authorization-server issuer changed or does not match. Reconnect Semlens MCP instead of reusing cached client registration.",
       name: "authorization server issuer",
       status: auth.issuerMatches ? "pass" : "fail",
     },
@@ -535,32 +535,32 @@ async function runDoctor(flags: Map<string, string | true>) {
 function readCodexConfigDiagnosticMessage(code: CodexConfigDiagnosticCode) {
   const messages: Record<CodexConfigDiagnosticCode, string> = {
     config_missing:
-      "Codex user config was not found. Run `deskrules mcp setup codex` for a canonical block.",
+      "Codex user config was not found. Run `semlens mcp setup codex` for a canonical block.",
     config_not_regular:
       "Codex config is not a regular file. Repair refused without reading or changing it.",
     config_not_utf8: "Codex config is not valid UTF-8. Repair refused.",
     config_too_large:
       "Codex config exceeds the bounded diagnostic size. Repair refused.",
     custom_server_name:
-      "A custom-named MCP block uses the canonical Desk Rules endpoint. Its name is preserved.",
-    desk_rules_block_missing:
-      "No recognized Desk Rules MCP block was found. Run `deskrules mcp setup codex`.",
+      "A custom-named MCP block uses the canonical Semlens endpoint. Its name is preserved.",
+    semlens_block_missing:
+      "No recognized Semlens MCP block was found. Run `semlens mcp setup codex`.",
     healthy:
-      "The Desk Rules MCP block uses the canonical endpoint and requested discovery profile.",
+      "The Semlens MCP block uses the canonical endpoint and requested discovery profile.",
     invalid_service_tier:
-      "The global service_tier value `default` is unsupported. Remove that line manually; Desk Rules repair will not change global Codex settings.",
+      "The global service_tier value `default` is unsupported. Remove that line manually; Semlens repair will not change global Codex settings.",
     malformed_toml:
       "Codex config is malformed TOML. Repair refused; fix the syntax or restore a known-good backup.",
-    multiple_desk_rules_blocks:
-      "Multiple possible Desk Rules MCP blocks were found. Repair refused; keep exactly one canonical-endpoint block.",
+    multiple_semlens_blocks:
+      "Multiple possible Semlens MCP blocks were found. Repair refused; keep exactly one canonical-endpoint block.",
     restricted_starter_profile:
-      "The recognized Desk Rules block uses the current explicit starter profile.",
+      "The recognized Semlens block uses the current explicit starter profile.",
     stale_enabled_tools:
       "The selected profile differs from the current enabled_tools allowlist.",
     custom_enabled_tools:
-      "The recognized Desk Rules block has a custom enabled_tools allowlist. It was preserved because no profile change was requested.",
-    unsupported_desk_rules_block:
-      "The Desk Rules block uses an unsupported or mixed structure. Repair refused.",
+      "The recognized Semlens block has a custom enabled_tools allowlist. It was preserved because no profile change was requested.",
+    unsupported_semlens_block:
+      "The Semlens block uses an unsupported or mixed structure. Repair refused.",
   }
   return messages[code]
 }
@@ -576,7 +576,7 @@ function createCodexConfigChecks(plan: CodexConfigRepairPlan): CliCheck[] {
             code === "custom_enabled_tools" ||
             code === "custom_server_name" ||
             code === "config_missing" ||
-            code === "desk_rules_block_missing"
+            code === "semlens_block_missing"
           ? "warn"
           : "fail",
   }))
@@ -603,19 +603,19 @@ function hasFailures(checks: readonly CliCheck[]) {
 async function printDoctor(flags: Map<string, string | true>) {
   const result = await runDoctor(flags)
   const payload = {
-    billingPath: DESK_RULES_MCP_SERVER_MANIFEST.recoveryPaths.billing,
+    billingPath: SEMLENS_MCP_SERVER_MANIFEST.recoveryPaths.billing,
     checks: result.checks,
     docsUrl: `${PUBLIC_DOCS_ORIGIN}${DOCS_PATH}`,
     endpoint: result.endpoint,
-    expectedManifestVersion: DESK_RULES_MCP_SERVER_MANIFEST.manifestVersion,
-    pricingPath: DESK_RULES_MCP_SERVER_MANIFEST.recoveryPaths.pricing,
-    protocolCompatibility: DESK_RULES_MCP_SERVER_MANIFEST.protocolCompatibility,
+    expectedManifestVersion: SEMLENS_MCP_SERVER_MANIFEST.manifestVersion,
+    pricingPath: SEMLENS_MCP_SERVER_MANIFEST.recoveryPaths.pricing,
+    protocolCompatibility: SEMLENS_MCP_SERVER_MANIFEST.protocolCompatibility,
   }
 
   if (hasFlag(flags, "json")) {
     process.stdout.write(`${JSON.stringify(payload, null, 2)}\n`)
   } else {
-    process.stdout.write("Desk Rules MCP doctor\n")
+    process.stdout.write("Semlens MCP doctor\n")
     process.stdout.write(
       `Endpoint: ${result.endpoint ?? "[unsafe endpoint omitted]"}\n`,
     )
@@ -639,7 +639,7 @@ async function printDoctor(flags: Map<string, string | true>) {
     process.stdout.write(
       "Billing diagnostics never quote prices or recommend a plan; the live Pricing page is authoritative.\n",
     )
-    process.stdout.write("Next: authenticate Desk Rules MCP in your agent.\n")
+    process.stdout.write("Next: authenticate Semlens MCP in your agent.\n")
   }
   process.exitCode = hasFailures(result.checks) ? 1 : 0
 }
@@ -652,9 +652,9 @@ function printCodexSetup(args: CodexSetupArgs) {
     args.profile === "starter"
       ? [
           "",
-          "# Explicit restricted starter profile generated from the Desk Rules manifest.",
+          "# Explicit restricted starter profile generated from the Semlens manifest.",
           "enabled_tools = [",
-          ...DESK_RULES_MCP_STARTER_PROFILE_TOOL_NAMES.map(
+          ...SEMLENS_MCP_STARTER_PROFILE_TOOL_NAMES.map(
             (toolName) => `  "${toolName}",`,
           ),
           "]",
@@ -662,24 +662,24 @@ function printCodexSetup(args: CodexSetupArgs) {
       : []
   process.stdout.write(
     [
-      "Desk Rules MCP Codex setup",
+      "Semlens MCP Codex setup",
       `Profile: ${args.profile}`,
       "",
-      "Use this manual configuration only when the Desk Rules plugin is not installed:",
+      "Use this manual configuration only when the Semlens plugin is not installed:",
       "",
-      "[mcp_servers.desk-rules-mcp]",
+      "[mcp_servers.semlens-mcp]",
       `url = ${JSON.stringify(endpoint)}`,
       'auth = "oauth"',
       'default_tools_approval_mode = "writes"',
       "tool_timeout_sec = 120",
       ...profileLines,
       "",
-      "Then open Codex, authenticate Desk Rules MCP, and run /mcp to confirm it is connected.",
+      "Then open Codex, authenticate Semlens MCP, and run /mcp to confirm it is connected.",
       "Compatible clients negotiate modern MCP automatically with stateless legacy fallback.",
       args.profile === "full"
-        ? DESK_RULES_MCP_SERVER_MANIFEST.clientProfiles.full.description
-        : DESK_RULES_MCP_SERVER_MANIFEST.clientProfiles.default.description,
-      DESK_RULES_MCP_SERVER_MANIFEST.compatibility.reconnectPolicy
+        ? SEMLENS_MCP_SERVER_MANIFEST.clientProfiles.full.description
+        : SEMLENS_MCP_SERVER_MANIFEST.clientProfiles.default.description,
+      SEMLENS_MCP_SERVER_MANIFEST.compatibility.reconnectPolicy
         .permissionInvariant,
       `Docs: ${createDocsUrl(endpoint)}`,
       `Agent setup prompt: ${createPromptDocsUrl(endpoint)}`,
@@ -699,12 +699,12 @@ function printClaudeSetup(flags: Map<string, string | true>) {
   const endpoint = readSafeSetupEndpoint(flags)
   process.stdout.write(
     [
-      "Desk Rules MCP Claude setup",
+      "Semlens MCP Claude setup",
       "",
       "Run in PowerShell or a POSIX shell:",
-      `claude mcp add --transport http desk-rules-mcp '${endpoint}'`,
+      `claude mcp add --transport http semlens-mcp '${endpoint}'`,
       "",
-      "Then use Claude's MCP connection flow to authenticate Desk Rules MCP.",
+      "Then use Claude's MCP connection flow to authenticate Semlens MCP.",
       "Compatible clients negotiate modern MCP automatically with stateless legacy fallback.",
       `Docs: ${createDocsUrl(endpoint)}`,
       `Agent setup prompt: ${createPromptDocsUrl(endpoint)}`,
@@ -733,14 +733,14 @@ function printCodexRepairResult(input: {
     return
   }
 
-  process.stdout.write("Desk Rules MCP Codex config repair\n")
+  process.stdout.write("Semlens MCP Codex config repair\n")
   process.stdout.write(`Mode: ${payload.mode}\n`)
   process.stdout.write(`Status: ${payload.status}\n`)
   for (const diagnostic of input.plan.diagnostics) {
     process.stdout.write(`- ${readCodexConfigDiagnosticMessage(diagnostic)}\n`)
   }
   if (input.plan.actions.length > 0) {
-    process.stdout.write("Planned Desk Rules changes:\n")
+    process.stdout.write("Planned Semlens changes:\n")
     for (const action of input.plan.actions) {
       process.stdout.write(`- ${action}\n`)
     }
@@ -815,7 +815,7 @@ function printCodexRepair(args: CodexRepairArgs) {
         )}\n`,
       )
     } else {
-      process.stdout.write("Desk Rules MCP Codex config repair\n")
+      process.stdout.write("Semlens MCP Codex config repair\n")
       process.stdout.write("Mode: apply\n")
       process.stdout.write("Status: blocked\n")
       process.stdout.write(`- ${diagnostic}\n`)
@@ -830,36 +830,36 @@ function printCodexRepair(args: CodexRepairArgs) {
 }
 
 function printUpdateGuidance() {
-  const compatibility = DESK_RULES_MCP_SERVER_MANIFEST.compatibility
+  const compatibility = SEMLENS_MCP_SERVER_MANIFEST.compatibility
   process.stdout.write(
     [
-      "Desk Rules update guidance",
+      "Semlens update guidance",
       "",
       `Installed CLI version: ${CURRENT_CLI_VERSION}`,
-      `Current CLI bundle version: ${DESK_RULES_MCP_SERVER_MANIFEST.cli.currentVersion}`,
+      `Current CLI bundle version: ${SEMLENS_MCP_SERVER_MANIFEST.cli.currentVersion}`,
       `Current plugin bundle version: ${compatibility.currentPluginVersion}`,
       `Current skills bundle version: ${compatibility.currentSkillsVersion}`,
       `Minimum CLI version: ${compatibility.minimumCliVersion}`,
       `Minimum plugin version: ${compatibility.minimumPluginVersion}`,
       `Minimum skills version: ${compatibility.minimumSkillsVersion}`,
-      `Package manifest version: ${DESK_RULES_MCP_SERVER_MANIFEST.manifestVersion}`,
-      `Modern MCP protocol: ${DESK_RULES_MCP_SERVER_MANIFEST.protocolCompatibility.modern.protocolVersion}`,
-      `Legacy fallback: ${DESK_RULES_MCP_SERVER_MANIFEST.protocolCompatibility.legacy.protocolVersion} (${DESK_RULES_MCP_SERVER_MANIFEST.protocolCompatibility.legacy.mode})`,
+      `Package manifest version: ${SEMLENS_MCP_SERVER_MANIFEST.manifestVersion}`,
+      `Modern MCP protocol: ${SEMLENS_MCP_SERVER_MANIFEST.protocolCompatibility.modern.protocolVersion}`,
+      `Legacy fallback: ${SEMLENS_MCP_SERVER_MANIFEST.protocolCompatibility.legacy.protocolVersion} (${SEMLENS_MCP_SERVER_MANIFEST.protocolCompatibility.legacy.mode})`,
       "Durable MCP Tasks: not advertised; exports complete synchronously",
       "",
       "CLI one-time run:",
-      `${DESK_RULES_MCP_SERVER_MANIFEST.cli.npmRunCommand} mcp doctor`,
+      `${SEMLENS_MCP_SERVER_MANIFEST.cli.npmRunCommand} mcp doctor`,
       "",
       "CLI persistent install/update:",
-      DESK_RULES_MCP_SERVER_MANIFEST.cli.npmPersistentInstallCommand,
-      "npm update -g @desk-rules/cli",
+      SEMLENS_MCP_SERVER_MANIFEST.cli.npmPersistentInstallCommand,
+      "npm update -g @semlens/cli",
       "",
       "Plugin updates happen through Codex plugin update/install flow once the plugin is available.",
-      "Bundled skills are included in this CLI package; run `deskrules skills list` to locate them.",
+      "Bundled skills are included in this CLI package; run `semlens skills list` to locate them.",
       compatibility.reconnectPolicy.capabilityChange,
       compatibility.reconnectPolicy.endpointChange,
       compatibility.reconnectPolicy.permissionInvariant,
-      "Account workflow permissions are managed in Desk Rules Account > Agent. Re-run authorization inspection after changing them.",
+      "Account workflow permissions are managed in Semlens Account > Agent. Re-run authorization inspection after changing them.",
       "Publishing requires explicit approval for every specific publication even when authorization inspection reports Publish available.",
       `Agent setup prompt: ${PUBLIC_DOCS_ORIGIN}${PROMPT_DOCS_PATH}`,
       "Standalone binaries are planned; npm is the first CLI distribution channel, not the only long-term channel.",
@@ -874,12 +874,12 @@ function readPackageRootPath() {
 
 function printSkillsList() {
   const packageRoot = readPackageRootPath()
-  process.stdout.write("Desk Rules bundled skills\n")
+  process.stdout.write("Semlens bundled skills\n")
   process.stdout.write(
-    `Package: ${DESK_RULES_MCP_SERVER_MANIFEST.cli.npmPackageName}\n`,
+    `Package: ${SEMLENS_MCP_SERVER_MANIFEST.cli.npmPackageName}\n`,
   )
   process.stdout.write(
-    `MCP endpoint: ${DESK_RULES_MCP_SERVER_MANIFEST.canonicalEndpoint}\n`,
+    `MCP endpoint: ${SEMLENS_MCP_SERVER_MANIFEST.canonicalEndpoint}\n`,
   )
   process.stdout.write(
     "MCP is the capability layer. Skills are the behavior layer for compatible agents.\n\n",
@@ -898,28 +898,28 @@ function printSkillsList() {
 function printHelp() {
   process.stdout.write(
     [
-      "Desk Rules CLI",
+      "Semlens CLI",
       "",
       "Commands:",
-      "  deskrules auth login [--endpoint <url>] [--timeout-ms <ms>] [--json]",
-      "  deskrules auth status [--endpoint <url>] [--timeout-ms <ms>] [--json]",
-      "  deskrules auth logout [--endpoint <url>] [--json]",
-      "  deskrules mcp capabilities [--operation <id,id,...>] [--endpoint <url>] [--timeout-ms <ms>] [--json]",
-      "  deskrules mcp call <tool> (--input <json>|--input-file <path>) [--output-file <path>|--output-directory <path>] [--overwrite] [--approve-write|--approve-external] [--endpoint <url>] [--timeout-ms <ms>] [--json]",
-      "  deskrules media upload (--file <path> --request-id <uuid>|--batch-file <path>) --approve-write [--endpoint <url>] [--timeout-ms <ms>] [--json]",
-      "  deskrules brand upload (--kind <logo|font> --label <label> --file <path> --request-id <uuid>|--batch-file <path>) --approve-write [--endpoint <url>] [--timeout-ms <ms>] [--json]",
-      "  deskrules studio reference upload --file <path> --request-id <uuid> --approve-write [--endpoint <url>] [--timeout-ms <ms>] [--json]",
-      "  deskrules feedback submit --summary <text> --report-file <path> --request-id <uuid> [--attachment-file <path>|--attachments-file <path>] --approve-write [--pathname <path>] [--endpoint <url>] [--timeout-ms <ms>] [--json]",
-      "  deskrules feedback status (--report-id <uuid>|--request-id <uuid>) [--endpoint <url>] [--timeout-ms <ms>] [--json]",
-      "  deskrules mcp doctor [--client codex] [--config <path>] [--endpoint <url>] [--offline] [--json] [--cli-version <x>] [--plugin-version <x>] [--skills-version <x>]",
-      "  deskrules mcp repair codex [--config <path>] [--profile <full|starter>] [--apply] [--json]",
-      "  deskrules mcp setup codex [--endpoint <url>] [--profile <full|starter>]",
-      "  deskrules mcp setup claude [--endpoint <url>]",
-      "  deskrules update",
-      "  deskrules skills list",
-      "  deskrules help",
+      "  semlens auth login [--endpoint <url>] [--timeout-ms <ms>] [--json]",
+      "  semlens auth status [--endpoint <url>] [--timeout-ms <ms>] [--json]",
+      "  semlens auth logout [--endpoint <url>] [--json]",
+      "  semlens mcp capabilities [--operation <id,id,...>] [--endpoint <url>] [--timeout-ms <ms>] [--json]",
+      "  semlens mcp call <tool> (--input <json>|--input-file <path>) [--output-file <path>|--output-directory <path>] [--overwrite] [--approve-write|--approve-external] [--endpoint <url>] [--timeout-ms <ms>] [--json]",
+      "  semlens media upload (--file <path> --request-id <uuid>|--batch-file <path>) --approve-write [--endpoint <url>] [--timeout-ms <ms>] [--json]",
+      "  semlens brand upload (--kind <logo|font> --label <label> --file <path> --request-id <uuid>|--batch-file <path>) --approve-write [--endpoint <url>] [--timeout-ms <ms>] [--json]",
+      "  semlens studio reference upload --file <path> --request-id <uuid> --approve-write [--endpoint <url>] [--timeout-ms <ms>] [--json]",
+      "  semlens feedback submit --summary <text> --report-file <path> --request-id <uuid> [--attachment-file <path>|--attachments-file <path>] --approve-write [--pathname <path>] [--endpoint <url>] [--timeout-ms <ms>] [--json]",
+      "  semlens feedback status (--report-id <uuid>|--request-id <uuid>) [--endpoint <url>] [--timeout-ms <ms>] [--json]",
+      "  semlens mcp doctor [--client codex] [--config <path>] [--endpoint <url>] [--offline] [--json] [--cli-version <x>] [--plugin-version <x>] [--skills-version <x>]",
+      "  semlens mcp repair codex [--config <path>] [--profile <full|starter>] [--apply] [--json]",
+      "  semlens mcp setup codex [--endpoint <url>] [--profile <full|starter>]",
+      "  semlens mcp setup claude [--endpoint <url>]",
+      "  semlens update",
+      "  semlens skills list",
+      "  semlens help",
       "",
-      "Operational commands use the same authenticated Desk Rules MCP tools as connected agents.",
+      "Operational commands use the same authenticated Semlens MCP tools as connected agents.",
       "Native preview images are written only when an explicit output path is supplied; existing files are preserved unless --overwrite is used for a single file.",
       "Do not place credentials, authorization codes, or signed capability URLs in --input; use owner-scoped tool IDs and bounded JSON only.",
       `Agent setup prompt: ${PUBLIC_DOCS_ORIGIN}${PROMPT_DOCS_PATH}`,

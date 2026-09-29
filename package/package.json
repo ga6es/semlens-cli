@@ -1,17 +1,17 @@
 {
-  "name": "@desk-rules/cli",
+  "name": "@semlens/cli",
   "version": "0.5.0",
-  "description": "Authenticated Desk Rules MCP client, setup, diagnostics, and update guidance.",
+  "description": "Authenticated Semlens MCP client, setup, diagnostics, and update guidance.",
   "type": "module",
   "private": false,
-  "homepage": "https://deskrules.com/docs/mcp",
+  "homepage": "https://semlens.com/docs/mcp",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ga6es/desk-rules-cli.git",
+    "url": "git+https://github.com/ga6es/semlens-cli.git",
     "directory": "package"
   },
   "bugs": {
-    "url": "https://github.com/ga6es/desk-rules-cli/issues"
+    "url": "https://github.com/ga6es/semlens-cli/issues"
   },
   "keywords": [
     "desk-rules",
@@ -21,7 +21,7 @@
     "claude"
   ],
   "bin": {
-    "deskrules": "dist/index.js"
+    "semlens": "dist/index.js"
   },
   "files": [
     "dist",
@@ -29,7 +29,7 @@
     "NOTICE",
     "README.md",
     "package.json",
-    "skills/desk-rules-mcp"
+    "skills/semlens-mcp"
   ],
   "scripts": {
     "build": "tsc -p tsconfig.json",

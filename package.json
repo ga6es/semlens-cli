@@ -1,17 +1,17 @@
 {
-  "name": "desk-rules-cli-public-workspace",
+  "name": "semlens-cli-public-workspace",
   "version": "0.0.0-private",
   "private": true,
   "workspaces": [
     "package"
   ],
   "scripts": {
-    "build": "npm run build --workspace @desk-rules/cli",
+    "build": "npm run build --workspace @semlens/cli",
     "check": "npm run check:export && npm run build && npm test && npm run check:package && npm run check:package-contents",
     "check:export": "node scripts/verify-export.mjs",
     "check:package": "node scripts/check-package.mjs",
-    "check:package-contents": "npm pack --dry-run --json --workspace @desk-rules/cli",
-    "sbom": "npm sbom --workspace @desk-rules/cli --sbom-format cyclonedx",
+    "check:package-contents": "npm pack --dry-run --json --workspace @semlens/cli",
+    "sbom": "npm sbom --workspace @semlens/cli --sbom-format cyclonedx",
     "test": "node --import tsx --test tests/*.test.ts"
   },
   "devDependencies": {

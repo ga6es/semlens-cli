@@ -2,10 +2,10 @@ import assert from "node:assert/strict"
 import { readFileSync } from "node:fs"
 
 const metadata = JSON.parse(readFileSync("package/package.json", "utf8"))
-assert.equal(metadata.name, "@desk-rules/cli")
+assert.equal(metadata.name, "@semlens/cli")
 assert.equal(metadata.version, "0.5.0")
 assert.equal(metadata.license, "Apache-2.0")
-assert.equal(metadata.repository.url, "git+https://github.com/ga6es/desk-rules-cli.git")
+assert.equal(metadata.repository.url, "git+https://github.com/ga6es/semlens-cli.git")
 assert.equal(metadata.repository.directory, "package")
 assert.deepEqual(metadata.dependencies, {
   "@modelcontextprotocol/client": "2.0.0",
@@ -20,13 +20,13 @@ assert.deepEqual(metadata.files, [
   "NOTICE",
   "README.md",
   "package.json",
-  "skills/desk-rules-mcp",
+  "skills/semlens-mcp",
 ])
 
 const license = readFileSync("package/LICENSE", "utf8")
 const notice = readFileSync("package/NOTICE", "utf8")
 assert.match(license, /Apache License/)
 assert.match(license, /Copyright 2026 Desk Rules contributors/)
-assert.match(notice, /Desk Rules contributors/)
+assert.match(notice, /Semlens contributors/)
 
-process.stdout.write("Desk Rules CLI package contract passed.\n")
+process.stdout.write("Semlens CLI package contract passed.\n")

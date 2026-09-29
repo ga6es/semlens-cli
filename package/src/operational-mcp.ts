@@ -4,7 +4,7 @@ import type {
   Client,
   Tool,
 } from "@modelcontextprotocol/client"
-import { DESK_RULES_MCP_SERVER_MANIFEST } from "./manifest.js"
+import { SEMLENS_MCP_SERVER_MANIFEST } from "./manifest.js"
 import { saveToolResultImages } from "./image-files.js"
 
 const MAX_INPUT_BYTES = 1024 * 1024
@@ -212,7 +212,7 @@ function readCapability(result: CallToolResult, operationId: string): Capability
     throw new OperationalMcpError("capability_mismatch")
   }
   const manifestVersion = result.structuredContent.manifestVersion
-  if (manifestVersion !== DESK_RULES_MCP_SERVER_MANIFEST.manifestVersion) {
+  if (manifestVersion !== SEMLENS_MCP_SERVER_MANIFEST.manifestVersion) {
     throw new OperationalMcpError("manifest_mismatch")
   }
   const entries = result.structuredContent.capabilities
@@ -351,7 +351,7 @@ export async function executeRegisteredTool(input: {
   return {
     approvalClass: capability.approvalClass,
     ...(imageFiles ? { imageFiles } : {}),
-    manifestVersion: DESK_RULES_MCP_SERVER_MANIFEST.manifestVersion,
+    manifestVersion: SEMLENS_MCP_SERVER_MANIFEST.manifestVersion,
     ok: toolResultOk(result),
     operationId: input.toolName,
     result: projectToolResult(result, input.toolName),
@@ -408,7 +408,7 @@ function readCapabilityPage(result: CallToolResult) {
   if (
     result.isError ||
     !isRecord(result.structuredContent) ||
-    result.structuredContent.manifestVersion !== DESK_RULES_MCP_SERVER_MANIFEST.manifestVersion ||
+    result.structuredContent.manifestVersion !== SEMLENS_MCP_SERVER_MANIFEST.manifestVersion ||
     !Array.isArray(result.structuredContent.capabilities)
   ) {
     throw new OperationalMcpError("manifest_mismatch")
@@ -432,12 +432,12 @@ function projectCapabilityResult(result: CallToolResult) {
   if (
     result.isError ||
     !isRecord(result.structuredContent) ||
-    result.structuredContent.manifestVersion !== DESK_RULES_MCP_SERVER_MANIFEST.manifestVersion
+    result.structuredContent.manifestVersion !== SEMLENS_MCP_SERVER_MANIFEST.manifestVersion
   ) {
     throw new OperationalMcpError("manifest_mismatch")
   }
   return {
-    manifestVersion: DESK_RULES_MCP_SERVER_MANIFEST.manifestVersion,
+    manifestVersion: SEMLENS_MCP_SERVER_MANIFEST.manifestVersion,
     ok: toolResultOk(result),
     result: projectToolResult(result, "inspect_mcp_capabilities"),
   }

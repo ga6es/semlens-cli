@@ -17,8 +17,8 @@ import { homedir } from "node:os"
 import { basename, dirname, join, resolve } from "node:path"
 import { parse } from "smol-toml"
 import {
-  DESK_RULES_MCP_SERVER_MANIFEST,
-  DESK_RULES_MCP_STARTER_PROFILE_TOOL_NAMES,
+  SEMLENS_MCP_SERVER_MANIFEST,
+  SEMLENS_MCP_STARTER_PROFILE_TOOL_NAMES,
 } from "./manifest.js"
 import { parseSafeMcpUrl } from "./safe-mcp-url.js"
 
@@ -31,15 +31,15 @@ export type CodexConfigDiagnosticCode =
   | "config_not_utf8"
   | "config_too_large"
   | "custom_server_name"
-  | "desk_rules_block_missing"
+  | "semlens_block_missing"
   | "healthy"
   | "invalid_service_tier"
   | "malformed_toml"
-  | "multiple_desk_rules_blocks"
+  | "multiple_semlens_blocks"
   | "restricted_starter_profile"
   | "stale_enabled_tools"
   | "custom_enabled_tools"
-  | "unsupported_desk_rules_block"
+  | "unsupported_semlens_block"
 
 export type CodexConfigRepairAction =
   | "remove_enabled_tools"
@@ -133,11 +133,11 @@ function isTableHeader(line: string) {
   return /^\s*\[\[?.+\]\]?\s*(?:#.*)?$/.test(line)
 }
 
-function isCanonicalDeskRulesEndpoint(value: unknown) {
+function isCanonicalSemlensEndpoint(value: unknown) {
   if (typeof value !== "string") return false
   const actual = parseSafeMcpUrl(value)
   if (!actual) return false
-  const canonical = new URL(DESK_RULES_MCP_SERVER_MANIFEST.canonicalEndpoint)
+  const canonical = new URL(SEMLENS_MCP_SERVER_MANIFEST.canonicalEndpoint)
   const normalizePath = (path: string) => path.replace(/\/+$/, "") || "/"
   return (
     actual.origin === canonical.origin &&
@@ -148,7 +148,7 @@ function isCanonicalDeskRulesEndpoint(value: unknown) {
 function renderStarterProfile(newline: string) {
   return [
     "enabled_tools = [",
-    ...DESK_RULES_MCP_STARTER_PROFILE_TOOL_NAMES.map(
+    ...SEMLENS_MCP_STARTER_PROFILE_TOOL_NAMES.map(
       (toolName) => `  "${toolName}",`,
     ),
     "]",
@@ -244,29 +244,29 @@ type ResolvedServer = {
   name: string
 }
 
-function resolveDeskRulesServer(
+function resolveSemlensServer(
   servers: Record<string, unknown>,
 ): ResolvedServer | CodexConfigDiagnosticCode {
-  const canonicalName = DESK_RULES_MCP_SERVER_MANIFEST.serverName
+  const canonicalName = SEMLENS_MCP_SERVER_MANIFEST.serverName
   const candidateNames = Object.keys(servers).filter((name) => {
     const config = servers[name]
     return (
       name === canonicalName ||
-      (isRecord(config) && isCanonicalDeskRulesEndpoint(config.url))
+      (isRecord(config) && isCanonicalSemlensEndpoint(config.url))
     )
   })
-  if (candidateNames.length === 0) return "desk_rules_block_missing"
-  if (candidateNames.length !== 1) return "multiple_desk_rules_blocks"
+  if (candidateNames.length === 0) return "semlens_block_missing"
+  if (candidateNames.length !== 1) return "multiple_semlens_blocks"
   const name = candidateNames[0]!
   const config = servers[name]
-  if (!isRecord(config)) return "unsupported_desk_rules_block"
+  if (!isRecord(config)) return "unsupported_semlens_block"
   if (
     typeof config.command === "string" ||
     Array.isArray(config.args) ||
     typeof config.cwd === "string" ||
-    !isCanonicalDeskRulesEndpoint(config.url)
+    !isCanonicalSemlensEndpoint(config.url)
   ) {
-    return "unsupported_desk_rules_block"
+    return "unsupported_semlens_block"
   }
   return { config, name }
 }
@@ -352,9 +352,9 @@ function planProfileEdits(input: {
   if (assignmentEnd === null) return null
   const tools = input.serverConfig.enabled_tools as string[]
   const starter =
-    tools.length === DESK_RULES_MCP_STARTER_PROFILE_TOOL_NAMES.length &&
+    tools.length === SEMLENS_MCP_STARTER_PROFILE_TOOL_NAMES.length &&
     tools.every(
-      (name, index) => name === DESK_RULES_MCP_STARTER_PROFILE_TOOL_NAMES[index],
+      (name, index) => name === SEMLENS_MCP_STARTER_PROFILE_TOOL_NAMES[index],
     )
   diagnostics.push(
     starter
@@ -413,7 +413,7 @@ function finalizeCodexConfigPlan(input: {
   } catch {
     return blockedPlan([
       ...input.diagnostics,
-      "unsupported_desk_rules_block",
+      "unsupported_semlens_block",
     ])
   }
   return {
@@ -448,11 +448,11 @@ export function planCodexConfigRepair(
   }
 
   const servers = isRecord(parsed.mcp_servers) ? parsed.mcp_servers : {}
-  const resolvedServer = resolveDeskRulesServer(servers)
-  if (resolvedServer === "desk_rules_block_missing") {
+  const resolvedServer = resolveSemlensServer(servers)
+  if (resolvedServer === "semlens_block_missing") {
     return {
       actions: [],
-      diagnostics: [...diagnostics, "desk_rules_block_missing"],
+      diagnostics: [...diagnostics, "semlens_block_missing"],
       safeToApply: false,
       sourceHash: fingerprint(sourceWithOptionalBom),
       status: diagnostics.length > 0 ? "blocked" : "missing",
@@ -468,10 +468,10 @@ export function planCodexConfigRepair(
     sourceBlock.urlLines.length !== 1 ||
     sourceBlock.enabledToolsLines.length > 1
   ) {
-    return blockedPlan([...diagnostics, "unsupported_desk_rules_block"])
+    return blockedPlan([...diagnostics, "unsupported_semlens_block"])
   }
   const { blockEnd, enabledToolsLines } = sourceBlock
-  if (resolvedServer.name !== DESK_RULES_MCP_SERVER_MANIFEST.serverName) {
+  if (resolvedServer.name !== SEMLENS_MCP_SERVER_MANIFEST.serverName) {
     diagnostics.push("custom_server_name")
   }
   const profilePlan = planProfileEdits({
@@ -482,7 +482,7 @@ export function planCodexConfigRepair(
     source,
   })
   if (!profilePlan) {
-    return blockedPlan([...diagnostics, "unsupported_desk_rules_block"])
+    return blockedPlan([...diagnostics, "unsupported_semlens_block"])
   }
   diagnostics.push(...profilePlan.diagnostics)
   const { actions, edits } = profilePlan
@@ -554,6 +554,17 @@ function createBackupPath(configPath: string) {
   return candidate
 }
 
+/** The temporary file must be durable and closed before replacement, even on write failure. */
+function writeRepairFile(path: string, source: string, mode: number) {
+  const descriptor = openSync(path, "wx", mode)
+  try {
+    writeFileSync(descriptor, source, { encoding: "utf8" })
+    fsyncSync(descriptor)
+  } finally {
+    closeSync(descriptor)
+  }
+}
+
 export function applyCodexConfigRepair(
   configPath: string,
   plan: CodexConfigRepairPlan,
@@ -582,18 +593,13 @@ export function applyCodexConfigRepair(
   const backupPath = createBackupPath(configPath)
   const tempPath = join(
     dirname(configPath),
-    `.${basename(configPath)}.deskrules-${process.pid}-${randomUUID()}.tmp`,
+    `.${basename(configPath)}.semlens-${process.pid}-${randomUUID()}.tmp`,
   )
-  let tempDescriptor: number | null = null
 
   copyFileSync(configPath, backupPath, constants.COPYFILE_EXCL)
   chmodSync(backupPath, file.mode & 0o777)
   try {
-    tempDescriptor = openSync(tempPath, "wx", file.mode & 0o777)
-    writeFileSync(tempDescriptor, plan.updatedSource, { encoding: "utf8" })
-    fsyncSync(tempDescriptor)
-    closeSync(tempDescriptor)
-    tempDescriptor = null
+    writeRepairFile(tempPath, plan.updatedSource, file.mode & 0o777)
 
     dependencies.beforeReplace?.()
     const currentBytes = readFileSync(configPath)
@@ -605,7 +611,6 @@ export function applyCodexConfigRepair(
     renameFile(tempPath, configPath)
     return { backupCreated: true, status: "applied" }
   } catch (error) {
-    if (tempDescriptor !== null) closeSync(tempDescriptor)
     rmSync(tempPath, { force: true })
     throw new CodexConfigApplyError(
       error instanceof Error && error.message === "config_changed"

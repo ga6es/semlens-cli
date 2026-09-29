@@ -15,7 +15,7 @@
 
 ## Import Media Before Editing
 
-1. For local media, run `deskrules media upload` with one stable request UUID
+1. For local media, run `semlens media upload` with one stable request UUID
    and `--approve-write`. For a local batch, use a bounded JSON batch file.
 2. For remote media, call `import_uploaded_assets_from_urls` with public HTTPS
    URLs and external-write approval. Treat per-item failures as independent;
