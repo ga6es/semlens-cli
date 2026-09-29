@@ -42,7 +42,7 @@
     },
     {
       "path": "package-lock.json",
-      "sha256": "9903926064a9627f47504798630b38b2ce01c310b3bc65003fa0ebe89a4d3cc6"
+      "sha256": "56f017aa6a8da3a0f647dfcb90fe535c4a5b33e44f9d9912820801f6d08dd485"
     },
     {
       "path": "package.json",
@@ -58,11 +58,11 @@
     },
     {
       "path": "package/README.md",
-      "sha256": "23baaa61e328ff4729ff674bb34ca19ada30d574b9700ae032c71e4af553ce36"
+      "sha256": "ddc25e624e7dac446288a664071cb8e9dbd3b7485914ac11c488835542ae051b"
     },
     {
       "path": "package/package.json",
-      "sha256": "b49fbe54b4baa7de167c9d1516f8463eda8746c8d8124ab93b665bd185327470"
+      "sha256": "d81b4310041c88d0f303370206745b907630ddf10ec842a2a0c1e1d41a847bed"
     },
     {
       "path": "package/skills/semlens-mcp/SKILL.md",
@@ -90,11 +90,11 @@
     },
     {
       "path": "package/skills/semlens-mcp/playbooks/submit-feedback.md",
-      "sha256": "c1aca266de3337b54bda24936a18294f1029fcb205d5bb35902a01159f49823a"
+      "sha256": "0ee2dc91881910f4ca7c00bedf4f078758b7503275829aa0ef1f9d87b117fcb5"
     },
     {
       "path": "package/skills/semlens-mcp/playbooks/troubleshooting.md",
-      "sha256": "eb619e96af4b07f5f09b99b1d7a2dd1f61bedbe8d217f756a99acc5dbfc1e220"
+      "sha256": "d5c96a4ea0499340e0b6944a61856236c8770357176f97d3751c6e8ad5549358"
     },
     {
       "path": "package/src/codex-config-repair.ts",
@@ -110,11 +110,11 @@
     },
     {
       "path": "package/src/index.ts",
-      "sha256": "15c4c823854bc3abaf01baeff3fef53b60ad13f10b8c8f1f949c95cc473fddd8"
+      "sha256": "07a3e19e3c8e90f7bd87c0ca87b1fd2ebfd6cf919cb76e889a4fecdc2dd5112f"
     },
     {
       "path": "package/src/manifest.ts",
-      "sha256": "5fca7a6e9e9737af5210b798a22070c1d5d38cf20d921bd4fe983043d90f86d7"
+      "sha256": "cebc6b1f762480060f070312fc747282a457bdfb0821c6cec41cb1c80b4d112b"
     },
     {
       "path": "package/src/media-upload.ts",
@@ -142,7 +142,7 @@
     },
     {
       "path": "package/src/public-compatibility.ts",
-      "sha256": "3d8593f882765f16d03a7d3275c8ac6f626e6c292079b72cb1083ca74753afa9"
+      "sha256": "4d5b5d0053a5eb8aa0237ef8f39567a5709feaaa4dc7444d7f7cf8a3aa02d523"
     },
     {
       "path": "package/src/safe-mcp-url.ts",
@@ -162,7 +162,7 @@
     },
     {
       "path": "scripts/check-package.mjs",
-      "sha256": "73f4127dcfeb7f7a807636b1795afca5688f9619aa88428f9b67a1f787473692"
+      "sha256": "66fe980987064ffcff749c4d951c4c8de262e1e9fad583d00bea5a2673443cce"
     },
     {
       "path": "scripts/verify-export.mjs",
@@ -179,8 +179,8 @@
   ],
   "schemaVersion": 1,
   "source": {
-    "commit": "de8e24920323f979313c6ab54180509b46db60d7",
-    "repository": "ga6es/semlens",
+    "commit": "c71fd989d7db86c55b527488985d8f40b08647e7",
+    "repository": "ga6es/desk-rules",
     "root": "packages/cli"
   }
 }

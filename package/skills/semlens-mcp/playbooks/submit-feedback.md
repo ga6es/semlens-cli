@@ -3,6 +3,10 @@
 1. Confirm the user wants to submit feedback, then inspect the static
    capabilities and live authorization for `submit_workspace_feedback` and
    `inspect_workspace_feedback_status`.
+   Before approval, disclose that the summary, reporter name, email and sign-in
+   provider, sanitized route, report ID/time and attachment count go to Semlens's
+   fixed private Trello support board. Full report, reproduction details and
+   attachment bytes remain private in Semlens; delivery cannot be assumed reversible.
 2. Prepare one stable submission UUID. Keep the full report in a local UTF-8
    file for CLI use or in the versioned MCP request; preserve its exact text.
 3. Before attaching evidence, inspect it for credentials, private URLs, signed

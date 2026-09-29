@@ -37,8 +37,8 @@ export const SEMLENS_MCP_SERVER_MANIFEST = {
   clientProfiles: SEMLENS_PUBLIC_COMPATIBILITY.clientProfiles,
   recoveryPaths: {
     accountAccess: "/account/agent",
-    billing: "/account/billing",
-    pricing: "/pricing",
+    billing: null,
+    pricing: null,
     providerConnections: null,
   },
   manifestVersion: SEMLENS_PUBLIC_COMPATIBILITY.manifestVersion,

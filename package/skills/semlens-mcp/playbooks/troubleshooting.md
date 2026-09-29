@@ -23,6 +23,11 @@ namespaces.
 
 Never ask for tokens, client secrets, full config files, or raw backups.
 
+On `billing_required`, explain that the feature needs an existing eligible
+account, preserve completed work and stop. Do not display plans, promote upgrades,
+subscriptions or credit purchases, or link to purchase flows. Re-inspect
+authorization in a new request after account eligibility changes independently.
+
 Publishing connection setup and reconnection are currently unavailable. Do not
 direct users to Apps or start provider OAuth setup. Preserve completed work and
 stop when a publishing connection is required; do not loop retries or bypass

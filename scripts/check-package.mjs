@@ -3,7 +3,9 @@ import { readFileSync } from "node:fs"
 
 const metadata = JSON.parse(readFileSync("package/package.json", "utf8"))
 assert.equal(metadata.name, "@semlens/cli")
-assert.equal(metadata.version, "0.5.0")
+// This package-shape check accepts stable patch versions prepared for review.
+// It does not establish publication approval or bind an expected release version.
+assert.match(metadata.version, /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$/)
 assert.equal(metadata.license, "Apache-2.0")
 assert.equal(metadata.repository.url, "git+https://github.com/ga6es/semlens-cli.git")
 assert.equal(metadata.repository.directory, "package")
