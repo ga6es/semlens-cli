@@ -631,13 +631,7 @@ async function printDoctor(flags: Map<string, string | true>) {
     printChecks(result.checks)
     process.stdout.write(`Docs: ${payload.docsUrl}\n`)
     process.stdout.write(
-      `Billing: ${PUBLIC_DOCS_ORIGIN}${payload.billingPath}\n`,
-    )
-    process.stdout.write(
-      `Pricing: ${PUBLIC_DOCS_ORIGIN}${payload.pricingPath}\n`,
-    )
-    process.stdout.write(
-      "Billing diagnostics never quote prices or recommend a plan; the live Pricing page is authoritative.\n",
+      "Features may require existing account entitlements. Diagnostics do not initiate purchases or upgrades.\n",
     )
     process.stdout.write("Next: authenticate Semlens MCP in your agent.\n")
   }
