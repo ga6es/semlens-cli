@@ -23,6 +23,16 @@ namespaces.
 
 Never ask for tokens, client secrets, full config files, or raw backups.
 
+For a keyed direct design edit or `commit_agent_draft`, keep the same UUID
+`operationId` and identical original input when the acknowledgement is uncertain
+or the result is retryable. Do not refresh the revision or draft version inside
+that retry. `operation_id_conflict` means the key already belongs to different
+input; a new key is for a separately intended approved edit. A
+`preparation_unknown` resource may be checked again with its original key for
+late completion, but must not be automatically redispatched. Unkeyed stale
+edits, broad page/template replacements, export and publishing require renewed
+inspection and strict freshness.
+
 On `billing_required`, explain that the feature needs an existing eligible
 account, preserve completed work and stop. Do not display plans, promote upgrades,
 subscriptions or credit purchases, or link to purchase flows. Re-inspect

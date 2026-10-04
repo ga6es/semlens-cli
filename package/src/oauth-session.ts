@@ -374,6 +374,7 @@ async function safeClose(client: Client | null) {
 }
 
 export async function loginWithBrowser(input: {
+  callbackPort?: number
   endpoint: string
   timeoutMs: number
   store?: ProtectedCredentialStore
@@ -392,6 +393,7 @@ export async function loginWithBrowser(input: {
   const state = randomBytes(32).toString("hex")
   const receiver = await createLoopbackCallbackReceiver({
     expectedState: state,
+    port: input.callbackPort,
     timeoutMs: input.timeoutMs,
   })
   const callbackOutcome = receiver.callback.then(
