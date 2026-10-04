@@ -626,7 +626,7 @@ async function printDoctor(flags: Map<string, string | true>) {
       `Protocol: MCP ${payload.protocolCompatibility.modern.protocolVersion} with automatic stateless legacy fallback\n`,
     )
     process.stdout.write(
-      "Durable MCP Tasks: not advertised; exports complete synchronously\n",
+      "MCP Tasks: not advertised; PNG/JPG/PDF synchronous; MP4/mixed-media jobs support start/status/retrieval/cancellation\n",
     )
     printChecks(result.checks)
     process.stdout.write(`Docs: ${payload.docsUrl}\n`)
@@ -839,7 +839,7 @@ function printUpdateGuidance() {
       `Package manifest version: ${SEMLENS_MCP_SERVER_MANIFEST.manifestVersion}`,
       `Modern MCP protocol: ${SEMLENS_MCP_SERVER_MANIFEST.protocolCompatibility.modern.protocolVersion}`,
       `Legacy fallback: ${SEMLENS_MCP_SERVER_MANIFEST.protocolCompatibility.legacy.protocolVersion} (${SEMLENS_MCP_SERVER_MANIFEST.protocolCompatibility.legacy.mode})`,
-      "Durable MCP Tasks: not advertised; exports complete synchronously",
+      "MCP Tasks: not advertised; PNG/JPG/PDF synchronous; MP4/mixed-media jobs support start/status/retrieval/cancellation",
       "",
       "CLI one-time run:",
       `${SEMLENS_MCP_SERVER_MANIFEST.cli.npmRunCommand} mcp doctor`,
@@ -895,7 +895,7 @@ function printHelp() {
       "Semlens CLI",
       "",
       "Commands:",
-      "  semlens auth login [--endpoint <url>] [--timeout-ms <ms>] [--json]",
+      "  semlens auth login [--endpoint <url>] [--timeout-ms <ms>] [--no-browser] [--json]",
       "  semlens auth status [--endpoint <url>] [--timeout-ms <ms>] [--json]",
       "  semlens auth logout [--endpoint <url>] [--json]",
       "  semlens mcp capabilities [--operation <id,id,...>] [--endpoint <url>] [--timeout-ms <ms>] [--json]",
@@ -914,7 +914,12 @@ function printHelp() {
       "  semlens help",
       "",
       "Operational commands use the same authenticated Semlens MCP tools as connected agents.",
+      "create_design_export waits up to 10 minutes by default; --timeout-ms may shorten that wait. A timed-out write has an uncertain result; inspect recent MCP activity before requesting a fresh export.",
+      "For durable MP4 or mixed exports: start_design_video_export --approve-write, inspect_design_video_export with exportOperationId, then retrieve_design_video_export with --output-file or --output-directory. Replay the same start request instead of creating a duplicate render.",
+      "cancel_design_video_export --approve-write requests cancellation; inspect until terminal. Pending retrieval writes no local file; retry retrieval of an existing artifact after a local transfer failure.",
       "Native preview images are written only when an explicit output path is supplied; existing files are preserved unless --overwrite is used for a single file.",
+      "Export output flags save ZIP/MP4 artifacts only and hide their signed URLs. PNG/JPG/PDF exports complete synchronously on the server, but the CLI cannot currently save those standalone export files; use an authorized MCP client supporting their file delivery and keep bearer URLs private.",
+      "Use videoOutputMode=mixed with staticFormat=png|jpg for an ordered ZIP of video and static pages; inspect pageResults and export-results.json before retrying failed pages.",
       "Do not place credentials, authorization codes, or signed capability URLs in --input; use owner-scoped tool IDs and bounded JSON only.",
       `Agent setup prompt: ${PUBLIC_DOCS_ORIGIN}${PROMPT_DOCS_PATH}`,
       "",

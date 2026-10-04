@@ -69,7 +69,14 @@ sources.
 ## Uploads Ingestion
 
 - Local media: run
-  `semlens media upload --file <path> --request-id <uuid> --approve-write`.
+  `semlens media upload --file <local-path> --request-id <uuid> --approve-write
+  --endpoint <same-mcp-endpoint> --json` on a host that can read the file.
+  Authenticate the CLI to that endpoint first if needed. An MCP
+  `prepare_uploaded_asset_upload` result with `status: awaiting_bytes` is only
+  a reservation; its `transfer` contract gives the authenticated PUT path and
+  byte requirements. A cloud MCP client without local-file/HTTP access cannot
+  finish this transfer by another MCP call. Never request or expose the OAuth
+  bearer token.
   The path stays in the CLI; MCP receives basename, size, hash, and a stable
   request ID before authenticated byte transfer. Batch files contain up to
   eight `file`/`requestId` items.
@@ -77,7 +84,9 @@ sources.
   HTTPS URLs and external-write approval. Credentials, private destinations,
   nonstandard ports, and HTTPS downgrades are rejected.
 - Each item and batch is capped at 50 MiB. Preserve request IDs across uncertain
-  retries; changed input under the same ID conflicts.
+  retries with the same unchanged file; changed input under the same ID
+  conflicts. Treat only a `status: ready` receipt and matching owner Uploads
+  inspection as completed ingestion.
 - Ingestion is a direct, zero-AI-credit account action with normal access,
   permission, owner, audit, approval, and media-verification gates. Reinspect
   returned asset IDs and materialize their previews before design use.
@@ -95,6 +104,8 @@ sources.
 
 ## Product Feedback
 
+- Feedback MCP tools require full-profile discovery; the bounded starter
+  profile omits them. The authenticated CLI feedback commands remain available.
 - Inspect `submit_workspace_feedback` and
   `inspect_workspace_feedback_status` capability and live authorization before
   writing. Feedback uses normal account, master-write, audit, and per-call

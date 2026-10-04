@@ -34,6 +34,7 @@ export const SEMLENS_MCP_SERVER_MANIFEST = {
       SEMLENS_PUBLIC_COMPATIBILITY.compatibilityText.updateContract,
   },
   protocolCompatibility: SEMLENS_PUBLIC_COMPATIBILITY.protocolCompatibility,
+  designOperationContract: SEMLENS_PUBLIC_COMPATIBILITY.designOperationContract,
   clientProfiles: SEMLENS_PUBLIC_COMPATIBILITY.clientProfiles,
   recoveryPaths: {
     accountAccess: "/account/agent",

@@ -24,7 +24,8 @@ import {
 
 const CALLBACK_HOST = "127.0.0.1"
 const CALLBACK_PATH = "/oauth/callback"
-const CALLBACK_PORT = 49_272
+// Native OAuth callbacks use an available OS-assigned loopback port (RFC 8252).
+const CALLBACK_PORT = 0
 const MAX_CALLBACK_URL_LENGTH = 8_192
 
 export class OAuthSessionError extends Error {
@@ -84,6 +85,7 @@ export class ProtectedOAuthProvider implements OAuthClientProvider {
     private readonly stateValue: string,
     private readonly launchAuthorization: (url: URL) => Promise<void>,
     private readonly operationSignal?: AbortSignal,
+    private forceClientRegistration = false,
   ) {
     if (session.discoveryState) assertSafeDiscoveryState(session.discoveryState, store.endpoint)
     this.latestIssuer = Object.keys(session.tokensByIssuer).at(-1) ?? null
@@ -106,6 +108,8 @@ export class ProtectedOAuthProvider implements OAuthClientProvider {
   }
 
   clientInformation(context?: OAuthClientInformationContext) {
+    // Explicit login must register the exact callback port selected for this transaction.
+    if (this.forceClientRegistration) return undefined
     const issuer = context?.issuer
     return issuer ? this.session.clientInformationByIssuer[normalizeUrl(issuer)] : undefined
   }
@@ -120,6 +124,7 @@ export class ProtectedOAuthProvider implements OAuthClientProvider {
       issuer,
     }
     await this.persist()
+    this.forceClientRegistration = false
   }
 
   tokens(context?: OAuthClientInformationContext) {
@@ -374,7 +379,9 @@ async function safeClose(client: Client | null) {
 }
 
 export async function loginWithBrowser(input: {
+  callbackPort?: number
   endpoint: string
+  onAuthorizationUrl?: (url: URL) => Promise<void>
   timeoutMs: number
   store?: ProtectedCredentialStore
 }) {
@@ -392,6 +399,7 @@ export async function loginWithBrowser(input: {
   const state = randomBytes(32).toString("hex")
   const receiver = await createLoopbackCallbackReceiver({
     expectedState: state,
+    port: input.callbackPort,
     timeoutMs: input.timeoutMs,
   })
   const callbackOutcome = receiver.callback.then(
@@ -407,12 +415,15 @@ export async function loginWithBrowser(input: {
       state,
       async (url) => {
         try {
-          await open(url.toString(), { wait: false })
+          // Controlled login uses the same validated URL and callback transaction.
+          if (input.onAuthorizationUrl) await input.onAuthorizationUrl(url)
+          else await open(url.toString(), { wait: false })
         } catch {
           throw new OAuthSessionError("browser_launch_failed")
         }
       },
       signal,
+      true,
     )
     await provider.invalidateCredentials("tokens")
     try {

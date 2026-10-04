@@ -12,6 +12,7 @@ import {
 } from "./operational-mcp.js"
 import { SEMLENS_MCP_SERVER_MANIFEST } from "./manifest.js"
 import { CliImageFileError } from "./image-files.js"
+import { CliExportFileError, validateExportOutputDestination } from "./export-files.js"
 import {
   inspectFeedbackStatus,
   readFeedbackSubmission,
@@ -35,6 +36,7 @@ import {
 const DEFAULT_OPERATION_TIMEOUT_MS = 30_000
 const MIN_TIMEOUT_MS = 1_000
 const MAX_TIMEOUT_MS = 120_000
+const MAX_EXPORT_TIMEOUT_MS = 600_000
 
 type ParsedOperationalFlags = {
   attachmentFile: string | null
@@ -49,6 +51,7 @@ type ParsedOperationalFlags = {
   json: boolean
   kind: string | null
   label: string | null
+  noBrowser: boolean
   operationIds: string[] | null
   outputDirectory: string | null
   outputFile: string | null
@@ -85,9 +88,11 @@ const BOOLEAN_FLAGS = new Set([
   "approve-external",
   "approve-write",
   "json",
+  "no-browser",
   "overwrite",
 ])
 const AUTH_FLAGS = new Set(["endpoint", "json", "timeout-ms"])
+const AUTH_LOGIN_FLAGS = new Set([...AUTH_FLAGS, "no-browser"])
 const CAPABILITY_FLAGS = new Set([
   "endpoint",
   "json",
@@ -154,13 +159,13 @@ const FEEDBACK_STATUS_FLAGS = new Set([
   "timeout-ms",
 ])
 
-function parseTimeout(value: string | null, defaultTimeoutMs: number) {
+function parseTimeout(value: string | null, defaultTimeoutMs: number, maxTimeoutMs: number) {
   if (value === null) return defaultTimeoutMs
   const timeout = Number(value)
   if (
     !Number.isInteger(timeout) ||
     timeout < MIN_TIMEOUT_MS ||
-    timeout > MAX_TIMEOUT_MS
+    timeout > maxTimeoutMs
   ) {
     throw new OperationalMcpError("input_invalid")
   }
@@ -240,6 +245,7 @@ function parseOperationalFlags(
   argv: readonly string[],
   allowedFlags: ReadonlySet<string>,
   defaultTimeoutMs = DEFAULT_OPERATION_TIMEOUT_MS,
+  maxTimeoutMs = MAX_TIMEOUT_MS,
 ): ParsedOperationalFlags {
   const { booleans, values } = collectOperationalFlags(argv, allowedFlags)
   const endpointInput =
@@ -262,6 +268,7 @@ function parseOperationalFlags(
     json: booleans.has("json"),
     kind: readOptionalFlag(values, "kind"),
     label: readOptionalFlag(values, "label"),
+    noBrowser: booleans.has("no-browser"),
     operationIds: parseOperationIds(readOptionalFlag(values, "operation")),
     outputDirectory,
     outputFile,
@@ -271,7 +278,7 @@ function parseOperationalFlags(
     reportId: readOptionalFlag(values, "report-id"),
     requestId: readOptionalFlag(values, "request-id"),
     summary: readOptionalFlag(values, "summary"),
-    timeoutMs: parseTimeout(readOptionalFlag(values, "timeout-ms"), defaultTimeoutMs),
+    timeoutMs: parseTimeout(readOptionalFlag(values, "timeout-ms"), defaultTimeoutMs, maxTimeoutMs),
   }
 }
 
@@ -281,6 +288,19 @@ type OperationalInvocation = {
   flagArgs: readonly string[]
   group: "auth" | "brand" | "feedback" | "mcp" | "media" | "studio"
   toolName?: string
+}
+
+export function resolveTimeoutPolicy(invocation: OperationalInvocation) {
+  if (invocation.group === "mcp" && invocation.toolName === "create_design_export") {
+    // A measured 22.94-second clip took 95.734 seconds to render and store.
+    // Keep the longer client wait exclusive to synchronous export creation.
+    return { defaultMs: MAX_EXPORT_TIMEOUT_MS, maxMs: MAX_EXPORT_TIMEOUT_MS }
+  }
+  if (["media", "brand", "studio"].includes(invocation.group) ||
+    (invocation.group === "feedback" && invocation.action === "submit")) {
+    return { defaultMs: MAX_TIMEOUT_MS, maxMs: MAX_TIMEOUT_MS }
+  }
+  return { defaultMs: DEFAULT_OPERATION_TIMEOUT_MS, maxMs: MAX_TIMEOUT_MS }
 }
 
 function assertMcpCallToolName(input: {
@@ -322,7 +342,7 @@ function readOperationalInvocation(
   if (group === "auth") {
     return {
       action: action!,
-      allowedFlags: AUTH_FLAGS,
+      allowedFlags: action === "login" ? AUTH_LOGIN_FLAGS : AUTH_FLAGS,
       flagArgs: argv.slice(2),
       group,
     }
@@ -372,6 +392,7 @@ function readOperationalInvocation(
 function safeErrorCode(error: unknown) {
   if (
     error instanceof OperationalMcpError ||
+    error instanceof CliExportFileError ||
     error instanceof CliMediaUploadError ||
     error instanceof CliImageFileError ||
     error instanceof OAuthSessionError ||
@@ -432,12 +453,20 @@ async function withStoredConnection<T>(input: {
   }
 }
 
-async function runAuthCommand(action: string, flags: ParsedOperationalFlags) {
+async function runAuthCommand(
+  action: string,
+  flags: ParsedOperationalFlags,
+  testOptions?: { callbackPort: number },
+) {
   const store = new ProtectedCredentialStore(flags.endpoint)
   if (action === "login") {
     return withEndpointCredentialLock(flags.endpoint, () =>
       loginWithBrowser({
+        callbackPort: testOptions?.callbackPort,
         endpoint: flags.endpoint,
+        onAuthorizationUrl: flags.noBrowser
+          ? async (url) => { process.stderr.write(`${url.toString()}\n`) }
+          : undefined,
         store,
         timeoutMs: flags.timeoutMs,
       }),
@@ -487,6 +516,14 @@ async function runMcpCommand(
   toolName: string | undefined,
   flags: ParsedOperationalFlags,
 ) {
+  if (action === "call" && ["create_design_export", "retrieve_design_video_export"].includes(toolName ?? "") &&
+    (flags.outputDirectory || flags.outputFile)) {
+    await validateExportOutputDestination({
+      outputDirectory: flags.outputDirectory,
+      outputFile: flags.outputFile,
+      overwrite: flags.overwrite,
+    })
+  }
   return withEndpointCredentialLock(flags.endpoint, () =>
     withStoredConnection({
       endpoint: flags.endpoint,
@@ -513,9 +550,11 @@ async function runMcpCommand(
           },
           arguments: argumentsValue,
           client,
+          endpoint: flags.endpoint,
           outputDirectory: flags.outputDirectory,
           outputFile: flags.outputFile,
           overwrite: flags.overwrite,
+          requestTimeoutMs: flags.timeoutMs,
           signal,
           toolName,
         })
@@ -636,26 +675,26 @@ async function runFeedbackCommand(
   )
 }
 
-export async function runOperationalCommand(argv: readonly string[]) {
+export async function runOperationalCommand(
+  argv: readonly string[],
+  testOptions?: { callbackPort: number },
+) {
   let invocation: OperationalInvocation | null = null
   let json = argv.includes("--json")
   try {
     invocation = readOperationalInvocation(argv)
     if (!invocation) return false
+    const timeoutPolicy = resolveTimeoutPolicy(invocation)
     const flags = parseOperationalFlags(
       invocation.flagArgs,
       invocation.allowedFlags,
-      invocation.group === "media" ||
-        invocation.group === "brand" ||
-        invocation.group === "studio" ||
-        (invocation.group === "feedback" && invocation.action === "submit")
-        ? MAX_TIMEOUT_MS
-        : DEFAULT_OPERATION_TIMEOUT_MS,
+      timeoutPolicy.defaultMs,
+      timeoutPolicy.maxMs,
     )
     json = flags.json
     let result
     if (invocation.group === "auth") {
-      result = await runAuthCommand(invocation.action, flags)
+      result = await runAuthCommand(invocation.action, flags, testOptions)
     } else if (invocation.group === "mcp") {
       result = await runMcpCommand(
         invocation.action,

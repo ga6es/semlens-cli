@@ -34,7 +34,7 @@
     },
     {
       "path": "README.md",
-      "sha256": "14114f63c90fc5c0828351fa5bbbb56cebdc0c5a020af916d4d93c0baa0fbff9"
+      "sha256": "aca576bef70dd0c4bf143103421e464225362f8d09216465ec7e318f98f05559"
     },
     {
       "path": "SECURITY.md",
@@ -42,7 +42,7 @@
     },
     {
       "path": "package-lock.json",
-      "sha256": "56f017aa6a8da3a0f647dfcb90fe535c4a5b33e44f9d9912820801f6d08dd485"
+      "sha256": "f9b9a6d2306480fd27209e48c2df5caff8c97ca65d7589d49ac3cc9fb04902ae"
     },
     {
       "path": "package.json",
@@ -58,23 +58,23 @@
     },
     {
       "path": "package/README.md",
-      "sha256": "ddc25e624e7dac446288a664071cb8e9dbd3b7485914ac11c488835542ae051b"
+      "sha256": "6e396d5cb05ac38172e8159a0c53a83810a3012cbc00caaf5e3c0f010091645b"
     },
     {
       "path": "package/package.json",
-      "sha256": "d81b4310041c88d0f303370206745b907630ddf10ec842a2a0c1e1d41a847bed"
+      "sha256": "7db9be02ed1a200446603ea2e157577597e359b24ed9cee202c2358e1355e8d6"
     },
     {
       "path": "package/skills/semlens-mcp/SKILL.md",
-      "sha256": "e42d7beba22485ae7f8793ba0b434a8fbd7805958de18e32b9d31838396f1689"
+      "sha256": "3847bb42f54be0881f32dbadbea8d808815fda959c9c0d7d6778dc92e8899869"
     },
     {
       "path": "package/skills/semlens-mcp/playbooks/design-draft-preview.md",
-      "sha256": "7a202f59f30c38f9ce776b5a83c0cd0d0d3361df758bbe8def554865fd6f3aea"
+      "sha256": "cf86740f28919f3244ce6a3164c4fe73bc0461e6987f8beaff76f8db5f2c3ca2"
     },
     {
       "path": "package/skills/semlens-mcp/playbooks/export-and-publish.md",
-      "sha256": "b2ac99b811a17d2f31b310eb4477d07e2af01da2b792e646ea1aa080d5ea539e"
+      "sha256": "0275bdbb39279515cbfa49833e938e3d39b3b568f97e6ebbcd0d0e1a05a290e8"
     },
     {
       "path": "package/skills/semlens-mcp/playbooks/first-safe-check.md",
@@ -94,11 +94,15 @@
     },
     {
       "path": "package/skills/semlens-mcp/playbooks/troubleshooting.md",
-      "sha256": "d5c96a4ea0499340e0b6944a61856236c8770357176f97d3751c6e8ad5549358"
+      "sha256": "95ba9d0f0d9085ddb2accf9c0ca4b09204d795a320a567949eefe9ebd1a87a48"
     },
     {
       "path": "package/src/codex-config-repair.ts",
       "sha256": "fd451e0c872600dd5d0c10d39e3c30e40cf42b59535686acefa28f7a7d86885a"
+    },
+    {
+      "path": "package/src/export-files.ts",
+      "sha256": "8525fbb29f9222079644bb7844c4fb29e8d476454ab2fa73a10f35884465c25c"
     },
     {
       "path": "package/src/feedback.ts",
@@ -110,11 +114,11 @@
     },
     {
       "path": "package/src/index.ts",
-      "sha256": "07a3e19e3c8e90f7bd87c0ca87b1fd2ebfd6cf919cb76e889a4fecdc2dd5112f"
+      "sha256": "80c40cfa67b166924ef0b9b7a3a90dbc080a1abbd1991e5319b97a7d6878b446"
     },
     {
       "path": "package/src/manifest.ts",
-      "sha256": "cebc6b1f762480060f070312fc747282a457bdfb0821c6cec41cb1c80b4d112b"
+      "sha256": "bf450f0012488de98c3d9add36567f311926590af4e0fe0c09ef587ae2794103"
     },
     {
       "path": "package/src/media-upload.ts",
@@ -130,19 +134,19 @@
     },
     {
       "path": "package/src/oauth-session.ts",
-      "sha256": "c5b3d053462fcb0dd1ab78fe670d750b21137d1a3abc4a710160fc7ae923afd9"
+      "sha256": "119a5dc1105e2e315baba07421d757e2217623e835316ca182e6f0d606a6a4f4"
     },
     {
       "path": "package/src/operational-cli.ts",
-      "sha256": "adb6bd4b7ae400ccafa81c40470c7a02e50acb7a08cc949bfc66c3363f521ccb"
+      "sha256": "8a98240f5a3058b387b17122da19380a6fc41564239e49b731f25359ce326ab6"
     },
     {
       "path": "package/src/operational-mcp.ts",
-      "sha256": "6d58cd76fbddd3366690444d2e948249c7475a7c2f90101ca11b7e9fc2bfd3c4"
+      "sha256": "65db6ebdd31d5f4cca316e96f8719690d54b8795c1d65f8169438289a139c57e"
     },
     {
       "path": "package/src/public-compatibility.ts",
-      "sha256": "4d5b5d0053a5eb8aa0237ef8f39567a5709feaaa4dc7444d7f7cf8a3aa02d523"
+      "sha256": "5331b8b2abf6c16fd08c60536e3a789affda927b57e29024278e05b4a03df4a5"
     },
     {
       "path": "package/src/safe-mcp-url.ts",
@@ -179,7 +183,7 @@
   ],
   "schemaVersion": 1,
   "source": {
-    "commit": "c71fd989d7db86c55b527488985d8f40b08647e7",
+    "commit": "8dae1c84aff828095ffa0dde3e31b2c119490b0d",
     "repository": "ga6es/desk-rules",
     "root": "packages/cli"
   }

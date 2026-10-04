@@ -38,6 +38,17 @@ semlens mcp call publish_design --input-file request.json --approve-external
 semlens skills list
 ```
 
+Use `semlens auth login --no-browser` to open the login in a chosen browser
+profile yourself. The authorization URL is written to stderr; the CLI waits
+for the same bounded local callback without launching a browser. With `--json`,
+stdout still contains only the final result. Treat the temporary login URL as
+private and do not save it in shared logs. This flag applies only to login.
+
+Each explicit login registers a new OAuth client for that transaction's exact
+local callback port, including when replacing an older fixed-port registration.
+Saved credentials are replaced only after the authenticated connection succeeds.
+Status checks and token refresh reuse the saved client without registering another.
+
 Codex setup uses the restricted starter profile by default. Full tool discovery
 requires explicit `--profile full`. Repair is dry-run by default and changes
 only one unambiguous remote Semlens block when rerun with `--apply`.
@@ -70,13 +81,49 @@ external writes such as publishing require the stronger `--approve-external`.
 Load nontrivial requests from `--input-file`; never place secrets, OAuth values,
 or signed capability URLs in command arguments.
 
+For durable MP4 or mixed-page export, prepare with `prepare_design_export`,
+then call `start_design_video_export --input-file <request.json> --approve-write`.
+Pass the prepared `expectedUpdatedAt`, `format: "mp4"`, page selection, and
+`videoOutputMode`. The response's `exportOperation.id` is the job identity;
+the CLI's top-level `operationId` names the MCP tool. Replaying the same start
+request reuses an active operation or a completed/partial operation with an
+unexpired artifact. A failed, cancelled, or expired operation permits a new
+render; start is not generally idempotent and that new export needs approval. Use
+`inspect_design_video_export` with `designId` and `exportOperationId` for
+progress, then `retrieve_design_video_export` with the same IDs and
+`--output-file <name.zip|name.mp4>` or an existing `--output-directory` once
+`downloadAvailable` is true. Pending retrieval writes no file. Retrieval
+checks current Export files permission and expiry without new billing or render.
+Its MCP result exposes a temporary private bearer download URL and artifact
+filename, type, and size to the authorized client; the CLI hides the URL from
+normal output. Keep the capability private. Bounded `openWorldHint: false`
+operations can still use the network and deliver private artifacts to clients.
+If saving fails, inspect and retry retrieval of the existing artifact.
+`cancel_design_video_export --approve-write` requests cancellation; inspect
+until terminal. A partial archive includes `export-results.json` so only failed
+pages need a new request.
+
+CLI export output flags save ZIP and MP4 artifacts only. PNG, JPG, and PDF
+exports complete synchronously on the server, but the CLI cannot currently save
+those standalone export files. Use an authorized MCP client that supports their
+file delivery and keep bearer URLs private. Native MCP preview-image saving is
+a separate supported path.
+
 `media upload` hashes and sizes each local file before asking MCP for a
 short-lived owner-scoped transfer. The filesystem path stays in the CLI; only
 the basename, size, SHA-256, and stable request ID reach MCP before the CLI
 streams the bytes with its protected OAuth session. A batch file is a JSON
 array of up to eight `{ "file": "...", "requestId": "<uuid>" }` items;
 the per-file and aggregate limit is 50 MiB. Reuse the same request ID for an
-uncertain retry, and do not reuse it for different input.
+uncertain retry with the same file, and do not reuse it for different input.
+If a separate MCP call already returned `awaiting_bytes`, run the CLI against
+that same endpoint and account with the same request ID and matching local
+filename, size, and bytes. The CLI may reuse the prepared session or obtain a
+fresh one after expiry; it sends the raw bytes over authenticated PUT and
+reports success only from a `ready` receipt. `awaiting_bytes` by itself is not
+an uploaded asset. Use `semlens auth login --endpoint <same-mcp-endpoint>` if
+the CLI has no valid protected session, and confirm the returned asset in
+Uploads. Never copy bearer tokens into CLI arguments or MCP requests.
 
 Brand uploads use `semlens brand upload` and the same authenticated streaming
 boundary as media uploads. Each item declares `kind` (`logo` or `font`), a
@@ -117,6 +164,26 @@ files, then use `feedback status`; never invent a new UUID for the same attempt.
 Private evidence remains in Semlens private storage and only the bounded
 summary, reporter context, and evidence count are mirrored to Trello.
 
+For direct saved-design commands and `commit_agent_draft`, put an optional UUID
+`operationId` in the input file. Use one key per intended approved edit; preserve
+the complete original JSON, including its revision or draft version, for an
+uncertain retry. The CLI calls once and does not automatically retry writes.
+The top-level CLI `operationId` names the tool; the design UUID is under
+`result.structuredContent.operationId`. Receipts include prior/current revision,
+`applied` or `unchanged`, changed pages and created/deleted structural IDs.
+Receipt arrays preserve up to 24 page IDs and 7,200 element IDs within the
+bounded result; ordinary inventory truncation remains separate.
+
+Keyed edits combine independent semantic properties; the last accepted
+transaction wins a shared property, and text is one property. Same key with
+changed input fails. Retryable contention or an uncertain acknowledgement uses
+the same key and original input. Unknown resource preparation uses a read-only
+saved-output lookup without provider redispatch; proven completion may finish
+the original approved design edit. A new request requires an explicit decision.
+Unkeyed edits, page/template replacements, export and publishing retain strict
+freshness. Agent Draft previews, owner permissions and explicit approval remain
+required.
+
 Native MCP preview images can be saved with one explicit `--output-file` or a
 pre-existing `--output-directory`. The CLI validates the actual JPEG/PNG
 bytes, enforces the server preview bound, calculates SHA-256, and publishes via
@@ -141,11 +208,11 @@ Draft version fence, and returns native image content only when
 
 ## Compatibility
 
-- Semlens CLI package version: `0.5.1`
+- Prepared Semlens CLI package version: `0.5.2` (publication pending)
 - Historical Desk Rules package: `@desk-rules/cli` version `0.2.4`
 - Minimum compatible CLI contract: `0.5.0`
-- Current plugin and bundled skill contract: `0.5.0`
-- MCP manifest: `2026-09-26.semlens-identity`
+- Current plugin and bundled skill contract: `0.5.1` (publication pending)
+- MCP manifest: `2026-10-03.design-operations`
 - Protocol: MCP `2026-07-28` with automatic stateless legacy fallback
 
 Run `mcp doctor` when a server, plugin, CLI, or skill bundle looks stale. The
@@ -161,7 +228,8 @@ publication preparation. The connected agent supplies its own permitted public
 web, search, or browser tools. Account > Agent > Design Rule remains the
 configurable design-selection instruction source.
 
-The starter profile covers common inspection and workflow operations. Agents
+The starter profile covers common inspection and workflow operations; workspace
+feedback MCP tools require full discovery or the authenticated CLI. Agents
 copy canonical configs and write tokens from inspection rather than guessing
 identifiers. Existing-design multi-step edits use Agent Draft; direct editor
 commands remain available for explicit one-step edits. Publishing always

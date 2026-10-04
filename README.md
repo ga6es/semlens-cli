@@ -32,21 +32,15 @@ Publication runs only by manual dispatch from the approval-gated `npm`
 environment. Trusted publishing through GitHub OIDC is the default, and every
 dispatch defaults to a dry run. No long-lived npm token is used.
 
-The first publication of `@semlens/cli@0.5.0` requires explicitly selecting
-`bootstrap`: token-based registry authentication with GitHub OIDC provenance.
-Before creating or using its credential, the owner must verify hosted production
-acceptance and approve the reviewed version, temporary credential and any CI
-2FA bypass. Use a one-day granular token limited to the `@semlens` scope, with
-no organization-management permission, as the `npm` environment secret
-`NPM_BOOTSTRAP_TOKEN`. The workflow rejects a missing credential, a different
-package/version, an existing registry package or an inconclusive registry lookup.
-These guards do not verify token expiry, permissions or release approval.
+The initial `@semlens/cli@0.5.0` bootstrap publication and temporary credential
+cleanup are complete. Version `0.5.1` used the existing trusted publisher for
+`ga6es/semlens-cli`, `publish.yml`, and the approval-gated `npm` environment.
+Published `0.5.0` and `0.5.1` remain immutable.
 
-Revoke the credential immediately after success or failure and remove the
-environment secret. After first publication, configure and verify the exact
-trusted publisher for `ga6es/semlens-cli`, `publish.yml` and the `npm` environment,
-allowing direct publication. Later versions use OIDC registry authentication.
-The workflow never automatically falls back to bootstrap or manages credentials.
+Future releases use that publisher with GitHub OIDC and manual dispatch,
+defaulting to a dry run. Actual publication requires explicit authorization of
+the exact new version. The workflow never automatically falls back to bootstrap
+or manages credentials.
 
 ## License boundary
 

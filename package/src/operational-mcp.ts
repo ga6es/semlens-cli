@@ -6,12 +6,20 @@ import type {
 } from "@modelcontextprotocol/client"
 import { SEMLENS_MCP_SERVER_MANIFEST } from "./manifest.js"
 import { saveToolResultImages } from "./image-files.js"
+import { CliExportFileError, saveToolResultExportArtifact } from "./export-files.js"
 
 const MAX_INPUT_BYTES = 1024 * 1024
 const MAX_OUTPUT_BYTES = 1024 * 1024
 const MAX_RESULT_DEPTH = 12
 const MAX_SCHEMA_RESULT_DEPTH = 40
 const MAX_RESULT_ITEMS = 200
+// DesignDocument permits 24 pages with 300 elements each. Accepted receipts
+// must retain structural IDs beyond the generic inventory limit, with a cap.
+const DESIGN_OPERATION_ID_LIMITS = {
+  changedPageIds: 24, createdPageIds: 24, deletedPageIds: 24,
+  createdElementIds: 7200, deletedElementIds: 7200,
+} as const
+const MAX_DESIGN_OPERATION_OUTPUT_BYTES = 3 * 1024 * 1024
 const MAX_CAPABILITY_PAGES = 10
 
 type ApprovalClass =
@@ -171,16 +179,36 @@ function retainResearchFreshnessToken(
   }
 }
 
+function isDesignOperationReceipt(value: unknown): value is Record<string, unknown> {
+  return isRecord(value) && typeof value.operationId === "string" &&
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(value.operationId) &&
+    (value.outcome === "applied" || value.outcome === "unchanged") &&
+    typeof value.previousUpdatedAt === "string" && typeof value.updatedAt === "string"
+}
+
+function retainDesignOperationIds(raw: unknown, sanitized: unknown) {
+  if (!isDesignOperationReceipt(raw) || !isRecord(sanitized)) return sanitized
+  const projected = { ...sanitized }
+  for (const [key, limit] of Object.entries(DESIGN_OPERATION_ID_LIMITS)) {
+    const ids = raw[key]
+    if (ids === undefined) continue
+    if (!Array.isArray(ids) || ids.length > limit || !ids.every(id => typeof id === "string" && id.length <= 160)) return "[invalid_operation_receipt]"
+    projected[key] = ids.map(id => sanitizeMachineValue(id))
+  }
+  return projected
+}
+
 function projectToolResult(result: CallToolResult, toolName: string) {
   const maximumDepth =
     toolName === "inspect_agent_draft_action_schema"
       ? MAX_SCHEMA_RESULT_DEPTH
       : MAX_RESULT_DEPTH
-  const structured = retainResearchFreshnessToken(
+  const researchStructured = retainResearchFreshnessToken(
     result.structuredContent,
     sanitizeMachineValue(result.structuredContent, 0, maximumDepth),
     toolName,
   )
+  const structured = retainDesignOperationIds(result.structuredContent, researchStructured)
   const contentTypes = result.content.map((item) => item.type)
   const projected = {
     contentTypes,
@@ -189,7 +217,8 @@ function projectToolResult(result: CallToolResult, toolName: string) {
     textContentOmitted: result.content.some((item) => item.type === "text"),
   }
   const serialized = JSON.stringify(projected)
-  if (Buffer.byteLength(serialized, "utf8") > MAX_OUTPUT_BYTES) {
+  const maximumBytes = isDesignOperationReceipt(structured) ? MAX_DESIGN_OPERATION_OUTPUT_BYTES : MAX_OUTPUT_BYTES
+  if (Buffer.byteLength(serialized, "utf8") > maximumBytes) {
     return {
       contentTypes,
       isError: result.isError === true,
@@ -299,6 +328,7 @@ export async function executeRegisteredToolRaw(input: {
   approvals: { external: boolean; write: boolean }
   arguments: Record<string, unknown>
   client: Client
+  requestTimeoutMs?: number
   signal: AbortSignal
   toolName: string
 }) {
@@ -316,7 +346,11 @@ export async function executeRegisteredToolRaw(input: {
   try {
     result = await input.client.callTool(
       { arguments: input.arguments, name: input.toolName },
-      { signal: input.signal, toolDefinition: tool },
+      {
+        signal: input.signal,
+        timeout: input.toolName === "create_design_export" ? input.requestTimeoutMs : undefined,
+        toolDefinition: tool,
+      },
     )
   } catch {
     throw new OperationalMcpError(
@@ -328,29 +362,80 @@ export async function executeRegisteredToolRaw(input: {
   return { capability, result }
 }
 
-export async function executeRegisteredTool(input: {
-  approvals: { external: boolean; write: boolean }
-  arguments: Record<string, unknown>
-  client: Client
+async function saveRequestedToolOutput(input: {
+  endpoint?: string
   outputDirectory?: string | null
   outputFile?: string | null
   overwrite?: boolean
   signal: AbortSignal
   toolName: string
+}, result: CallToolResult) {
+  if (!input.outputDirectory && !input.outputFile) return {}
+  if (["create_design_export", "retrieve_design_video_export"].includes(input.toolName)) {
+    if (!toolResultOk(result)) return {}
+    if (input.toolName === "retrieve_design_video_export" &&
+      (!isRecord(result.structuredContent) || !isRecord(result.structuredContent.artifact))) return {}
+    return { exportFile: await saveToolResultExportArtifact({
+      endpoint: input.endpoint ?? SEMLENS_MCP_SERVER_MANIFEST.canonicalEndpoint,
+      outputDirectory: input.outputDirectory ?? null,
+      outputFile: input.outputFile ?? null,
+      overwrite: input.overwrite ?? false,
+      result,
+      // The write timeout bounds remote creation. A completed artifact gets
+      // its own transfer window, even when rendering used most of that time.
+      signal: AbortSignal.timeout(300_000),
+    }) }
+  }
+  return { imageFiles: await saveToolResultImages({
+    outputDirectory: input.outputDirectory ?? null,
+    outputFile: input.outputFile ?? null,
+    overwrite: input.overwrite ?? false,
+    result,
+    signal: input.signal,
+  }) }
+}
+
+export async function executeRegisteredTool(input: {
+  approvals: { external: boolean; write: boolean }
+  arguments: Record<string, unknown>
+  client: Client
+  endpoint?: string
+  outputDirectory?: string | null
+  outputFile?: string | null
+  overwrite?: boolean
+  requestTimeoutMs?: number
+  signal: AbortSignal
+  toolName: string
 }) {
   const { capability, result } = await executeRegisteredToolRaw(input)
-  const imageFiles = input.outputDirectory || input.outputFile
-    ? await saveToolResultImages({
-        outputDirectory: input.outputDirectory ?? null,
-        outputFile: input.outputFile ?? null,
-        overwrite: input.overwrite ?? false,
-        result,
-        signal: input.signal,
-      })
-    : null
+  let savedOutput
+  try {
+    savedOutput = await saveRequestedToolOutput(input, result)
+  } catch (error) {
+    if (!(error instanceof CliExportFileError) ||
+      !["create_design_export", "retrieve_design_video_export"].includes(input.toolName) ||
+      !toolResultOk(result)) throw error
+    return {
+      approvalClass: capability.approvalClass,
+      exportFile: undefined,
+      imageFiles: undefined,
+      localSave: {
+        code: error.code,
+        ok: false,
+        nextStep: input.toolName === "retrieve_design_video_export"
+          ? "Inspect the existing export operation and retry retrieval; do not start another render."
+          : "Inspect recent MCP export activity before creating another export.",
+      },
+      manifestVersion: SEMLENS_MCP_SERVER_MANIFEST.manifestVersion,
+      ok: false,
+      operationId: input.toolName,
+      remoteExportMayExist: true,
+      result: projectToolResult(result, input.toolName),
+    }
+  }
   return {
     approvalClass: capability.approvalClass,
-    ...(imageFiles ? { imageFiles } : {}),
+    ...savedOutput,
     manifestVersion: SEMLENS_MCP_SERVER_MANIFEST.manifestVersion,
     ok: toolResultOk(result),
     operationId: input.toolName,
