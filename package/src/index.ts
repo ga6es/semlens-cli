@@ -918,7 +918,7 @@ function printHelp() {
       "For durable MP4 or mixed exports: start_design_video_export --approve-write, inspect_design_video_export with exportOperationId, then retrieve_design_video_export with --output-file or --output-directory. Replay the same start request instead of creating a duplicate render.",
       "cancel_design_video_export --approve-write requests cancellation; inspect until terminal. Pending retrieval writes no local file; retry retrieval of an existing artifact after a local transfer failure.",
       "Native preview images are written only when an explicit output path is supplied; existing files are preserved unless --overwrite is used for a single file.",
-      "For create_design_export, --output-file <name.zip|name.mp4> or --output-directory <existing-dir> saves the private artifact without printing its signed URL.",
+      "Export output flags save ZIP/MP4 artifacts only and hide their signed URLs. PNG/JPG/PDF exports complete synchronously on the server, but the CLI cannot currently save those standalone export files; use an authorized MCP client supporting their file delivery and keep bearer URLs private.",
       "Use videoOutputMode=mixed with staticFormat=png|jpg for an ordered ZIP of video and static pages; inspect pageResults and export-results.json before retrying failed pages.",
       "Do not place credentials, authorization codes, or signed capability URLs in --input; use owner-scoped tool IDs and bounded JSON only.",
       `Agent setup prompt: ${PUBLIC_DOCS_ORIGIN}${PROMPT_DOCS_PATH}`,

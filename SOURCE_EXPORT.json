@@ -58,7 +58,7 @@
     },
     {
       "path": "package/README.md",
-      "sha256": "71653021b3aebc1718af62e3acd8b850c88f8b8da0e619408cbcc6de8d06fbda"
+      "sha256": "6e396d5cb05ac38172e8159a0c53a83810a3012cbc00caaf5e3c0f010091645b"
     },
     {
       "path": "package/package.json",
@@ -74,7 +74,7 @@
     },
     {
       "path": "package/skills/semlens-mcp/playbooks/export-and-publish.md",
-      "sha256": "253fdf12e4d7480820f8c0277c214a2238275d353f068c4f20fc236e829280ed"
+      "sha256": "0275bdbb39279515cbfa49833e938e3d39b3b568f97e6ebbcd0d0e1a05a290e8"
     },
     {
       "path": "package/skills/semlens-mcp/playbooks/first-safe-check.md",
@@ -114,7 +114,7 @@
     },
     {
       "path": "package/src/index.ts",
-      "sha256": "3e85f1c743b291e74af35b46f3ba67f059c024f3e90765c3bb7131552828df40"
+      "sha256": "80c40cfa67b166924ef0b9b7a3a90dbc080a1abbd1991e5319b97a7d6878b446"
     },
     {
       "path": "package/src/manifest.ts",
@@ -183,7 +183,7 @@
   ],
   "schemaVersion": 1,
   "source": {
-    "commit": "c908efc808c1c36ea8fced086d84d7a89ec27257",
+    "commit": "8dae1c84aff828095ffa0dde3e31b2c119490b0d",
     "repository": "ga6es/desk-rules",
     "root": "packages/cli"
   }

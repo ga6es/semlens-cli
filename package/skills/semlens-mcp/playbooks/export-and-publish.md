@@ -44,8 +44,11 @@ Semlens MCP.
    Inspect again to confirm `cancelled`, `partial`, or `completed`.
 9. Synchronous `create_design_export` still gives the CLI a bounded 10-minute
    wait. If that write times out, inspect recent MCP activity before retrying.
-   The CLI saves its completed private artifact with the same explicit output
-   flags. The MCP retrieval result gives the authorized client a temporary
+   The CLI output flags save only ZIP and MP4 export artifacts. PNG, JPG, and
+   PDF exports complete synchronously on the server, but the CLI cannot currently
+   save those standalone export files with these flags. Use an authorized MCP
+   client that supports their file delivery; do not expose the bearer URL.
+   The MCP retrieval result gives the authorized client a temporary
    private download capability URL, filename, type, and size. Treat that bearer
    URL as private; the CLI hides it from normal output. Existing local files stay
    intact unless an explicit single-file `--overwrite` is used.

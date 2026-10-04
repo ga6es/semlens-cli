@@ -103,6 +103,12 @@ If saving fails, inspect and retry retrieval of the existing artifact.
 until terminal. A partial archive includes `export-results.json` so only failed
 pages need a new request.
 
+CLI export output flags save ZIP and MP4 artifacts only. PNG, JPG, and PDF
+exports complete synchronously on the server, but the CLI cannot currently save
+those standalone export files. Use an authorized MCP client that supports their
+file delivery and keep bearer URLs private. Native MCP preview-image saving is
+a separate supported path.
+
 `media upload` hashes and sizes each local file before asking MCP for a
 short-lived owner-scoped transfer. The filesystem path stays in the CLI; only
 the basename, size, SHA-256, and stable request ID reach MCP before the CLI
