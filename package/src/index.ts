@@ -626,7 +626,7 @@ async function printDoctor(flags: Map<string, string | true>) {
       `Protocol: MCP ${payload.protocolCompatibility.modern.protocolVersion} with automatic stateless legacy fallback\n`,
     )
     process.stdout.write(
-      "Durable MCP Tasks: not advertised; exports complete synchronously\n",
+      "MCP Tasks: not advertised; PNG/JPG/PDF synchronous; MP4/mixed-media jobs support start/status/retrieval/cancellation\n",
     )
     printChecks(result.checks)
     process.stdout.write(`Docs: ${payload.docsUrl}\n`)
@@ -839,7 +839,7 @@ function printUpdateGuidance() {
       `Package manifest version: ${SEMLENS_MCP_SERVER_MANIFEST.manifestVersion}`,
       `Modern MCP protocol: ${SEMLENS_MCP_SERVER_MANIFEST.protocolCompatibility.modern.protocolVersion}`,
       `Legacy fallback: ${SEMLENS_MCP_SERVER_MANIFEST.protocolCompatibility.legacy.protocolVersion} (${SEMLENS_MCP_SERVER_MANIFEST.protocolCompatibility.legacy.mode})`,
-      "Durable MCP Tasks: not advertised; exports complete synchronously",
+      "MCP Tasks: not advertised; PNG/JPG/PDF synchronous; MP4/mixed-media jobs support start/status/retrieval/cancellation",
       "",
       "CLI one-time run:",
       `${SEMLENS_MCP_SERVER_MANIFEST.cli.npmRunCommand} mcp doctor`,
@@ -895,7 +895,7 @@ function printHelp() {
       "Semlens CLI",
       "",
       "Commands:",
-      "  semlens auth login [--endpoint <url>] [--timeout-ms <ms>] [--json]",
+      "  semlens auth login [--endpoint <url>] [--timeout-ms <ms>] [--no-browser] [--json]",
       "  semlens auth status [--endpoint <url>] [--timeout-ms <ms>] [--json]",
       "  semlens auth logout [--endpoint <url>] [--json]",
       "  semlens mcp capabilities [--operation <id,id,...>] [--endpoint <url>] [--timeout-ms <ms>] [--json]",

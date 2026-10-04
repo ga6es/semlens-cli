@@ -34,7 +34,7 @@
     },
     {
       "path": "README.md",
-      "sha256": "14114f63c90fc5c0828351fa5bbbb56cebdc0c5a020af916d4d93c0baa0fbff9"
+      "sha256": "aca576bef70dd0c4bf143103421e464225362f8d09216465ec7e318f98f05559"
     },
     {
       "path": "SECURITY.md",
@@ -58,7 +58,7 @@
     },
     {
       "path": "package/README.md",
-      "sha256": "ff9f39182657eabe5e593aa23ff508ef3b34bcc9a27fe5da0b48070ecca67e7e"
+      "sha256": "71653021b3aebc1718af62e3acd8b850c88f8b8da0e619408cbcc6de8d06fbda"
     },
     {
       "path": "package/package.json",
@@ -114,7 +114,7 @@
     },
     {
       "path": "package/src/index.ts",
-      "sha256": "72963b24dc25307764775fe3987e7170931c2c788524c394cb7ce6258dc831cf"
+      "sha256": "3e85f1c743b291e74af35b46f3ba67f059c024f3e90765c3bb7131552828df40"
     },
     {
       "path": "package/src/manifest.ts",
@@ -134,11 +134,11 @@
     },
     {
       "path": "package/src/oauth-session.ts",
-      "sha256": "dfbead90d958b6cc4572ea0d75399819ce6bf44fafa97c0b1e5fd1673a168a4d"
+      "sha256": "119a5dc1105e2e315baba07421d757e2217623e835316ca182e6f0d606a6a4f4"
     },
     {
       "path": "package/src/operational-cli.ts",
-      "sha256": "8c86dd2bf6db184585011e3d028e906b168831ea4fff6b6ed97a7919bc399cb9"
+      "sha256": "8a98240f5a3058b387b17122da19380a6fc41564239e49b731f25359ce326ab6"
     },
     {
       "path": "package/src/operational-mcp.ts",
@@ -183,7 +183,7 @@
   ],
   "schemaVersion": 1,
   "source": {
-    "commit": "2dba46107faf691731362ce908d45ebc85c09b69",
+    "commit": "c908efc808c1c36ea8fced086d84d7a89ec27257",
     "repository": "ga6es/desk-rules",
     "root": "packages/cli"
   }

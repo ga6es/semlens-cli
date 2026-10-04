@@ -51,6 +51,7 @@ type ParsedOperationalFlags = {
   json: boolean
   kind: string | null
   label: string | null
+  noBrowser: boolean
   operationIds: string[] | null
   outputDirectory: string | null
   outputFile: string | null
@@ -87,9 +88,11 @@ const BOOLEAN_FLAGS = new Set([
   "approve-external",
   "approve-write",
   "json",
+  "no-browser",
   "overwrite",
 ])
 const AUTH_FLAGS = new Set(["endpoint", "json", "timeout-ms"])
+const AUTH_LOGIN_FLAGS = new Set([...AUTH_FLAGS, "no-browser"])
 const CAPABILITY_FLAGS = new Set([
   "endpoint",
   "json",
@@ -265,6 +268,7 @@ function parseOperationalFlags(
     json: booleans.has("json"),
     kind: readOptionalFlag(values, "kind"),
     label: readOptionalFlag(values, "label"),
+    noBrowser: booleans.has("no-browser"),
     operationIds: parseOperationIds(readOptionalFlag(values, "operation")),
     outputDirectory,
     outputFile,
@@ -338,7 +342,7 @@ function readOperationalInvocation(
   if (group === "auth") {
     return {
       action: action!,
-      allowedFlags: AUTH_FLAGS,
+      allowedFlags: action === "login" ? AUTH_LOGIN_FLAGS : AUTH_FLAGS,
       flagArgs: argv.slice(2),
       group,
     }
@@ -460,6 +464,9 @@ async function runAuthCommand(
       loginWithBrowser({
         callbackPort: testOptions?.callbackPort,
         endpoint: flags.endpoint,
+        onAuthorizationUrl: flags.noBrowser
+          ? async (url) => { process.stderr.write(`${url.toString()}\n`) }
+          : undefined,
         store,
         timeoutMs: flags.timeoutMs,
       }),

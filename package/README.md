@@ -38,6 +38,17 @@ semlens mcp call publish_design --input-file request.json --approve-external
 semlens skills list
 ```
 
+Use `semlens auth login --no-browser` to open the login in a chosen browser
+profile yourself. The authorization URL is written to stderr; the CLI waits
+for the same bounded local callback without launching a browser. With `--json`,
+stdout still contains only the final result. Treat the temporary login URL as
+private and do not save it in shared logs. This flag applies only to login.
+
+Each explicit login registers a new OAuth client for that transaction's exact
+local callback port, including when replacing an older fixed-port registration.
+Saved credentials are replaced only after the authenticated connection succeeds.
+Status checks and token refresh reuse the saved client without registering another.
+
 Codex setup uses the restricted starter profile by default. Full tool discovery
 requires explicit `--profile full`. Repair is dry-run by default and changes
 only one unambiguous remote Semlens block when rerun with `--apply`.
