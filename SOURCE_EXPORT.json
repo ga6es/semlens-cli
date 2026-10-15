@@ -42,7 +42,7 @@
     },
     {
       "path": "package-lock.json",
-      "sha256": "a9af3588bc694091fc63a57cad959e83929a3700027a3ee501002f74110fdb26"
+      "sha256": "ded3bc68a6ccbf1e5dc03211161df0c6f24652f0761e336b9e3b87e150f27241"
     },
     {
       "path": "package.json",
@@ -58,11 +58,11 @@
     },
     {
       "path": "package/README.md",
-      "sha256": "6e396d5cb05ac38172e8159a0c53a83810a3012cbc00caaf5e3c0f010091645b"
+      "sha256": "860bf858a8b431fffd888a865b61ea3836967c4f0737021a8a12a26b536bf502"
     },
     {
       "path": "package/package.json",
-      "sha256": "8cb26fc768077acf0948df7cee8d4d66023bf9ad60bb2c31a0beb9713251171c"
+      "sha256": "2b9e746f4c08a920fbb1b4f6944e6c5f9eb5511f9b3b6d3839e7258a88b9a38e"
     },
     {
       "path": "package/skills/semlens-mcp/SKILL.md",
@@ -146,7 +146,7 @@
     },
     {
       "path": "package/src/public-compatibility.ts",
-      "sha256": "5331b8b2abf6c16fd08c60536e3a789affda927b57e29024278e05b4a03df4a5"
+      "sha256": "0e9bcf5c8e498eb1b01733c7043b3fb8d1ced0693742f92906f23f6beb6f1b8d"
     },
     {
       "path": "package/src/safe-mcp-url.ts",
@@ -187,7 +187,7 @@
   ],
   "schemaVersion": 1,
   "source": {
-    "commit": "88760dbacc3f2bf736639eabe16c176a959f3dcd",
+    "commit": "281c34886e83a3d159ce95507d756d819104e675",
     "repository": "ga6es/desk-rules",
     "root": "packages/cli"
   }
