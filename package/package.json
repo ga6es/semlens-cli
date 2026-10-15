@@ -1,6 +1,6 @@
 {
   "name": "@semlens/cli",
-  "version": "0.5.2",
+  "version": "0.5.3",
   "description": "Authenticated Semlens MCP client, setup, diagnostics, and update guidance.",
   "type": "module",
   "private": false,
@@ -43,7 +43,7 @@
   },
   "license": "Apache-2.0",
   "dependencies": {
-    "@modelcontextprotocol/client": "2.0.0",
+    "@modelcontextprotocol/client": "2.2.0",
     "@napi-rs/keyring": "2.1.0",
     "open": "11.0.0",
     "smol-toml": "1.7.1"

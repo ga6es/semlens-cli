@@ -42,7 +42,7 @@
     },
     {
       "path": "package-lock.json",
-      "sha256": "f9b9a6d2306480fd27209e48c2df5caff8c97ca65d7589d49ac3cc9fb04902ae"
+      "sha256": "ded3bc68a6ccbf1e5dc03211161df0c6f24652f0761e336b9e3b87e150f27241"
     },
     {
       "path": "package.json",
@@ -58,11 +58,11 @@
     },
     {
       "path": "package/README.md",
-      "sha256": "6e396d5cb05ac38172e8159a0c53a83810a3012cbc00caaf5e3c0f010091645b"
+      "sha256": "860bf858a8b431fffd888a865b61ea3836967c4f0737021a8a12a26b536bf502"
     },
     {
       "path": "package/package.json",
-      "sha256": "7db9be02ed1a200446603ea2e157577597e359b24ed9cee202c2358e1355e8d6"
+      "sha256": "2b9e746f4c08a920fbb1b4f6944e6c5f9eb5511f9b3b6d3839e7258a88b9a38e"
     },
     {
       "path": "package/skills/semlens-mcp/SKILL.md",
@@ -134,7 +134,7 @@
     },
     {
       "path": "package/src/oauth-session.ts",
-      "sha256": "119a5dc1105e2e315baba07421d757e2217623e835316ca182e6f0d606a6a4f4"
+      "sha256": "a3b1719c0f3341c7b954c8001cb7ca58129772ffdee581163f4421c71817a8a5"
     },
     {
       "path": "package/src/operational-cli.ts",
@@ -146,7 +146,7 @@
     },
     {
       "path": "package/src/public-compatibility.ts",
-      "sha256": "5331b8b2abf6c16fd08c60536e3a789affda927b57e29024278e05b4a03df4a5"
+      "sha256": "0e9bcf5c8e498eb1b01733c7043b3fb8d1ced0693742f92906f23f6beb6f1b8d"
     },
     {
       "path": "package/src/safe-mcp-url.ts",
@@ -166,7 +166,7 @@
     },
     {
       "path": "scripts/check-package.mjs",
-      "sha256": "66fe980987064ffcff749c4d951c4c8de262e1e9fad583d00bea5a2673443cce"
+      "sha256": "f4be1ca3cb523069afdeb9cc7ea0c413a88a5aca40967854c4e391335cbdd1e3"
     },
     {
       "path": "scripts/verify-export.mjs",
@@ -179,11 +179,15 @@
     {
       "path": "tests/deny-keyring-loader.mjs",
       "sha256": "a3eb92e216840ebf48c17a4744cec5b44b4eb883f885bac65a9d753171ba7b0f"
+    },
+    {
+      "path": "tests/oauth-issuer.test.ts",
+      "sha256": "d40f699ace6a401a2a6394ff9b2210c44c08ab6f559e9d8736fa7530323a9dd0"
     }
   ],
   "schemaVersion": 1,
   "source": {
-    "commit": "8dae1c84aff828095ffa0dde3e31b2c119490b0d",
+    "commit": "281c34886e83a3d159ce95507d756d819104e675",
     "repository": "ga6es/desk-rules",
     "root": "packages/cli"
   }

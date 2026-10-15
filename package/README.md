@@ -208,7 +208,7 @@ Draft version fence, and returns native image content only when
 
 ## Compatibility
 
-- Prepared Semlens CLI package version: `0.5.2` (publication pending)
+- Prepared Semlens CLI package version: `0.5.3` (publication pending)
 - Historical Desk Rules package: `@desk-rules/cli` version `0.2.4`
 - Minimum compatible CLI contract: `0.5.0`
 - Current plugin and bundled skill contract: `0.5.1` (publication pending)
