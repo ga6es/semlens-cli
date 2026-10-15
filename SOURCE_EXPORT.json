@@ -42,7 +42,7 @@
     },
     {
       "path": "package-lock.json",
-      "sha256": "f9b9a6d2306480fd27209e48c2df5caff8c97ca65d7589d49ac3cc9fb04902ae"
+      "sha256": "a9af3588bc694091fc63a57cad959e83929a3700027a3ee501002f74110fdb26"
     },
     {
       "path": "package.json",
@@ -62,7 +62,7 @@
     },
     {
       "path": "package/package.json",
-      "sha256": "7db9be02ed1a200446603ea2e157577597e359b24ed9cee202c2358e1355e8d6"
+      "sha256": "8cb26fc768077acf0948df7cee8d4d66023bf9ad60bb2c31a0beb9713251171c"
     },
     {
       "path": "package/skills/semlens-mcp/SKILL.md",
@@ -134,7 +134,7 @@
     },
     {
       "path": "package/src/oauth-session.ts",
-      "sha256": "119a5dc1105e2e315baba07421d757e2217623e835316ca182e6f0d606a6a4f4"
+      "sha256": "a3b1719c0f3341c7b954c8001cb7ca58129772ffdee581163f4421c71817a8a5"
     },
     {
       "path": "package/src/operational-cli.ts",
@@ -166,7 +166,7 @@
     },
     {
       "path": "scripts/check-package.mjs",
-      "sha256": "66fe980987064ffcff749c4d951c4c8de262e1e9fad583d00bea5a2673443cce"
+      "sha256": "f4be1ca3cb523069afdeb9cc7ea0c413a88a5aca40967854c4e391335cbdd1e3"
     },
     {
       "path": "scripts/verify-export.mjs",
@@ -179,11 +179,15 @@
     {
       "path": "tests/deny-keyring-loader.mjs",
       "sha256": "a3eb92e216840ebf48c17a4744cec5b44b4eb883f885bac65a9d753171ba7b0f"
+    },
+    {
+      "path": "tests/oauth-issuer.test.ts",
+      "sha256": "d40f699ace6a401a2a6394ff9b2210c44c08ab6f559e9d8736fa7530323a9dd0"
     }
   ],
   "schemaVersion": 1,
   "source": {
-    "commit": "8dae1c84aff828095ffa0dde3e31b2c119490b0d",
+    "commit": "88760dbacc3f2bf736639eabe16c176a959f3dcd",
     "repository": "ga6es/desk-rules",
     "root": "packages/cli"
   }

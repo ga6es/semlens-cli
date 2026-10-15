@@ -69,9 +69,16 @@ function resolveIssuer(
   context: OAuthClientInformationContext | undefined,
   value?: unknown,
 ) {
-  const issuer = context?.issuer ?? readStampedIssuer(value)
+  const stamp = readStampedIssuer(value)
+  const issuer = context?.issuer ?? stamp
   if (!issuer) throw new OAuthSessionError("issuer_mismatch")
-  return normalizeUrl(issuer)
+  const normalizedIssuer = normalizeUrl(issuer)
+  // An SDK callback may add a missing stamp, but must never relabel credentials
+  // already bound to another authorization server.
+  if (stamp && normalizeUrl(stamp) !== normalizedIssuer) {
+    throw new OAuthSessionError("issuer_mismatch")
+  }
+  return normalizedIssuer
 }
 
 export class ProtectedOAuthProvider implements OAuthClientProvider {
