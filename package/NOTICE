@@ -3,9 +3,13 @@ Copyright 2026 Semlens contributors
 
 This product includes software developed by Semlens contributors.
 
-Runtime dependencies include the Model Context Protocol TypeScript client,
-@napi-rs/keyring, open, and smol-toml, each distributed under its respective
-MIT license.
+Runtime dependencies include:
+- @modelcontextprotocol/client and its @modelcontextprotocol/core dependency:
+  Apache License 2.0, with MIT-licensed contributions retained as described in
+  their upstream LICENSE files. Non-specification documentation contributions
+  are licensed under CC-BY-4.0 as described in those files.
+- @napi-rs/keyring and open: MIT License.
+- smol-toml: BSD 3-Clause License.
 
 Semlens names, logos, and trademarks are not licensed under the Apache
 License 2.0 except as necessary for reasonable and customary use in describing

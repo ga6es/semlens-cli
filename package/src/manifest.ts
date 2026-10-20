@@ -34,7 +34,6 @@ export const SEMLENS_MCP_SERVER_MANIFEST = {
       SEMLENS_PUBLIC_COMPATIBILITY.compatibilityText.updateContract,
   },
   protocolCompatibility: SEMLENS_PUBLIC_COMPATIBILITY.protocolCompatibility,
-  designOperationContract: SEMLENS_PUBLIC_COMPATIBILITY.designOperationContract,
   clientProfiles: SEMLENS_PUBLIC_COMPATIBILITY.clientProfiles,
   recoveryPaths: {
     accountAccess: "/account/agent",
@@ -55,10 +54,9 @@ export const SEMLENS_MCP_READ_FIRST_TOOL_NAMES = [
   "inspect_mcp_capabilities",
   "inspect_mcp_authorization_status",
   "inspect_rules",
-  "list_recent_designs",
-  "inspect_design_metadata",
-  "inspect_design_document",
-  "inspect_design_page",
+  "inspect_brand_kit",
+  "inspect_uploaded_assets",
+  "inspect_news_board_story_targets",
 ] as const
 
 export const SEMLENS_MCP_STARTER_PROFILE_TOOL_NAMES =

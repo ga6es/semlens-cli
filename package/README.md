@@ -28,13 +28,9 @@ semlens mcp call import_uploaded_assets_from_urls --input-file remote-media.json
 semlens brand upload --kind logo --label "Primary logo" --file ./logo.png --request-id <uuid> --approve-write
 semlens feedback submit --summary "Export freezes after save" --report-file ./feedback.txt --request-id <uuid> --attachment-file ./screen.png --approve-write
 semlens feedback status --request-id <uuid> --json
-semlens mcp call inspect_design_resource_preview --input '{"kind":"logo","id":"<logo-id>"}' --output-file logo-preview.jpg
-semlens mcp call inspect_design_page_preview --input-file page-previews.json --output-directory ./previews
-semlens mcp call inspect_design_asset_crop --input-file crop-preview.json --output-file crop-preview.jpg
+semlens mcp call inspect_asset_preview --input '{"kind":"logo","id":"<logo-id>"}' --output-file logo-preview.jpg
 semlens studio reference upload --file ./reference.webp --request-id <uuid> --approve-write
 semlens mcp call retrieve_studio_output_content --input '{"outputId":"<uuid>"}' --output-file result.webp
-semlens mcp call update_design_text --input-file request.json --approve-write
-semlens mcp call publish_design --input-file request.json --approve-external
 semlens skills list
 ```
 
@@ -56,6 +52,64 @@ only one unambiguous remote Semlens block when rerun with `--apply`.
 Install the Semlens plugin or configure the hosted server manually. They are
 alternative setup methods, not additive requirements. The CLI does not install
 skills into host-specific folders or grant Semlens write authorization.
+
+## Codex client approval diagnosis
+
+Keep `default_tools_approval_mode="writes"` for interactive Codex. It controls
+client approval prompts for mutations; Semlens account/workflow permissions remain
+separate. `mcp setup codex` prints manual configuration and never saves it.
+
+Diagnose saved settings without changing them:
+
+```bash
+semlens mcp doctor --client codex --offline --config ./reviewed-config.toml
+semlens mcp doctor --client codex --offline --config ./reviewed-config.toml --codex-approval-policy never --codex-tool save_news_board_story_research --codex-approval-rejected
+```
+
+The optional policy/rejection flags are caller-reported evidence, not runtime
+discovery. A reported approval-required/never rejection is client-side before
+Semlens, not an auth, owner or billing failure. It warns without changing the
+existing exit convention; malformed configuration still fails. Loaded policy
+stays `NOT_CHECKED`: CLI overrides, trusted project settings and managed
+requirements can supersede saved settings. No credentials or raw config are printed.
+
+For explicitly authorized unattended work, review a per-tool exception such as
+`[mcp_servers.semlens-mcp.tools.save_news_board_story_research]` with
+`approval_mode="approve"`; authorize that exact operation first. Plugin overrides
+use `[plugins."<installed-plugin-id>".mcp_servers.semlens-mcp.tools.save_news_board_story_research]`.
+Use the affected host's installed plugin ID; do not add a duplicate manual connection.
+Never switch the server default to blanket `approve`. Keep publishing and destructive
+actions separately prompted and authorized. Doctor and repair never broaden approval
+settings, reconnect accounts, or retry writes.
+
+`--codex-profile <name>` inspects legacy `[profiles.<name>]` tables only, without
+verifying active selection. Codex 0.134+ uses separate profile files; this doctor
+does not resolve the complete layered configuration. Inspect a specific file with
+`--config`, and use supported client session information for effective policy.
+Saved changes or a later recovery do not prove a running client reloaded them.
+
+## Native account verification
+
+Doctor reports `setupHealth` separately from
+`nativeAccountVerification.status: "not_checked"`. Its successful exit means
+no diagnosed setup failure; it does not certify a host's loaded MCP account.
+Standalone CLI login and browser identity do not prove native identity.
+
+In the affected host, call `inspect_mcp_authorization_status` through its native
+Semlens connection. `currentAccount` reports a server-authenticated safe reference
+and email only with OAuth email consent; local stdio leaves native identity
+unchecked. Compare only an intended identity supplied by the user. Missing email
+permission alone cannot establish an account mismatch. Verify identity through
+authorization inspection without probing private content.
+
+For an evidenced mismatch, stop writes. Identify the affected client and its
+associated executable/version through supported information; PATH Codex may
+differ from desktop Codex. Use that client's supported connection controls and
+obtain explicit approval before logout/account switching on a shared connection.
+After login, refresh/restart that host if needed and verify identity again through
+the same native connection. Do not inspect credential stores, change global PATH
+or promise a reconnect API. The bundled troubleshooting playbook contains the
+bounded recovery path.
 
 Operational commands use OAuth PKCE and the same registered MCP tools as
 connected agents. Windows credentials are stored in Windows Credential Manager;
@@ -81,33 +135,11 @@ external writes such as publishing require the stronger `--approve-external`.
 Load nontrivial requests from `--input-file`; never place secrets, OAuth values,
 or signed capability URLs in command arguments.
 
-For durable MP4 or mixed-page export, prepare with `prepare_design_export`,
-then call `start_design_video_export --input-file <request.json> --approve-write`.
-Pass the prepared `expectedUpdatedAt`, `format: "mp4"`, page selection, and
-`videoOutputMode`. The response's `exportOperation.id` is the job identity;
-the CLI's top-level `operationId` names the MCP tool. Replaying the same start
-request reuses an active operation or a completed/partial operation with an
-unexpired artifact. A failed, cancelled, or expired operation permits a new
-render; start is not generally idempotent and that new export needs approval. Use
-`inspect_design_video_export` with `designId` and `exportOperationId` for
-progress, then `retrieve_design_video_export` with the same IDs and
-`--output-file <name.zip|name.mp4>` or an existing `--output-directory` once
-`downloadAvailable` is true. Pending retrieval writes no file. Retrieval
-checks current Export files permission and expiry without new billing or render.
-Its MCP result exposes a temporary private bearer download URL and artifact
-filename, type, and size to the authorized client; the CLI hides the URL from
-normal output. Keep the capability private. Bounded `openWorldHint: false`
-operations can still use the network and deliver private artifacts to clients.
-If saving fails, inspect and retry retrieval of the existing artifact.
-`cancel_design_video_export --approve-write` requests cancellation; inspect
-until terminal. A partial archive includes `export-results.json` so only failed
-pages need a new request.
-
-CLI export output flags save ZIP and MP4 artifacts only. PNG, JPG, and PDF
-exports complete synchronously on the server, but the CLI cannot currently save
-those standalone export files. Use an authorized MCP client that supports their
-file delivery and keep bearer URLs private. Native MCP preview-image saving is
-a separate supported path.
+Native edits save directly through registered tools under current account and
+invocation permissions. Optional unsaved candidate preview is separate from
+saving; capture/export/status/cancel/private results use exact job references.
+The retired custom editor commands remain unavailable. Full executable check
+is unsupported, and source/controlled tests do not certify the actual runtime.
 
 `media upload` hashes and sizes each local file before asking MCP for a
 short-lived owner-scoped transfer. The filesystem path stays in the CLI; only
@@ -142,7 +174,7 @@ item independently. Both local and remote ingestion use
 zero AI credits while retaining active-account, edit-permission, approval,
 owner, audit, and media-verification gates. Inspect returned asset IDs with
 `inspect_uploaded_assets`, `inspect_uploaded_asset_identities`, and
-`inspect_design_resource_preview` before design use.
+`inspect_asset_preview` for authorized pixel inspection.
 
 `feedback submit` reads the full report from a local UTF-8 file and preserves
 its exact text up to 64 KiB. A stable request UUID makes retries duplicate-safe.
@@ -164,27 +196,7 @@ files, then use `feedback status`; never invent a new UUID for the same attempt.
 Private evidence remains in Semlens private storage and only the bounded
 summary, reporter context, and evidence count are mirrored to Trello.
 
-For direct saved-design commands and `commit_agent_draft`, put an optional UUID
-`operationId` in the input file. Use one key per intended approved edit; preserve
-the complete original JSON, including its revision or draft version, for an
-uncertain retry. The CLI calls once and does not automatically retry writes.
-The top-level CLI `operationId` names the tool; the design UUID is under
-`result.structuredContent.operationId`. Receipts include prior/current revision,
-`applied` or `unchanged`, changed pages and created/deleted structural IDs.
-Receipt arrays preserve up to 24 page IDs and 7,200 element IDs within the
-bounded result; ordinary inventory truncation remains separate.
-
-Keyed edits combine independent semantic properties; the last accepted
-transaction wins a shared property, and text is one property. Same key with
-changed input fails. Retryable contention or an uncertain acknowledgement uses
-the same key and original input. Unknown resource preparation uses a read-only
-saved-output lookup without provider redispatch; proven completion may finish
-the original approved design edit. A new request requires an explicit decision.
-Unkeyed edits, page/template replacements, export and publishing retain strict
-freshness. Agent Draft previews, owner permissions and explicit approval remain
-required.
-
-Native MCP preview images can be saved with one explicit `--output-file` or a
+Tool-result images can be saved with one explicit `--output-file` or a
 pre-existing `--output-directory`. The CLI validates the actual JPEG/PNG
 bytes, enforces the server preview bound, calculates SHA-256, and publishes via
 a sibling temporary file. Existing files fail closed; `--overwrite` is allowed
@@ -200,19 +212,15 @@ the UUID across an uncertain retry. Generated originals are written only to an
 explicit output path whose extension matches the returned PNG, JPEG, or WebP
 type.
 Ordinary `mcp call` output continues to omit image bytes and redact delivery
-capabilities. Upload, Brand, and design inventories return explicit preview
-request descriptors rather than bearer URLs; use the named preview tool to
-materialize pixels. Crop inspection requires a live-design timestamp or Agent
-Draft version fence, and returns native image content only when
-`includePreview` is true and materialization succeeds.
+capabilities. Inspect the live capability manifest before requesting asset pixels; metadata alone does not prove a delivered image.
 
 ## Compatibility
 
-- Prepared Semlens CLI package version: `0.5.3` (publication pending)
+- Prepared Semlens CLI package version: `0.5.4` (publication pending)
 - Historical Desk Rules package: `@desk-rules/cli` version `0.2.4`
 - Minimum compatible CLI contract: `0.5.0`
 - Current plugin and bundled skill contract: `0.5.1` (publication pending)
-- MCP manifest: `2026-10-03.design-operations`
+- Prepared MCP manifest: `2026-10-19.mcp-gpt-image-only`
 - Protocol: MCP `2026-07-28` with automatic stateless legacy fallback
 
 Run `mcp doctor` when a server, plugin, CLI, or skill bundle looks stale. The
@@ -222,29 +230,44 @@ changing account authorization.
 
 ## Workflow boundary
 
-Semlens MCP owns authorization, private workspace inspection, research
-persistence, template validation, editable design operations, export, and
-publication preparation. The connected agent supplies its own permitted public
-web, search, or browser tools. Account > Agent > Design Rule remains the
-configurable design-selection instruction source.
+Semlens MCP owns authorization, Research, account assets and native editing.
+Normal bounded setup includes native create/open/read/direct file and sidecar
+saves, import/Catalog, optional candidate preview/save and explicit jobs/results.
+No mandatory owner proposal approval is added to requested ordinary saves.
+Host invocation approval and account permissions still apply. Full executable
+check is unsupported; selected HTML static lint is narrower. Keep operation/job
+identity, exact versions and UNKNOWN evidence instead of blind retries.
 
-The starter profile covers common inspection and workflow operations; workspace
-feedback MCP tools require full discovery or the authenticated CLI. Agents
-copy canonical configs and write tokens from inspection rather than guessing
-identifiers. Existing-design multi-step edits use Agent Draft; direct editor
-commands remain available for explicit one-step edits. Publishing always
-requires explicit approval for the exact publication.
+Private native results use the current authenticated connection, not a public
+URL. The existing command writes only after bounded size/hash verification:
 
-Publishing connection setup and reconnection are currently unavailable. Do not
-direct users to Apps or start provider OAuth setup. Preserve completed work and
-stop when a connection is required. Existing ready connections still require
-current authorization and approval for the specific publication.
+```sh
+semlens mcp call inspect_native_project_result --input-file job.json --output-file result.mp4
+semlens mcp call inspect_native_project_candidate --input-file candidate.json --output-file preview.png
+```
 
-Studio generation and edit parity is a full-profile surface. The Codex plugin
-keeps the restricted starter allowlist; use authenticated operational CLI
-commands, or use the alternative manual setup with
-`semlens mcp setup codex --profile full`. Do not configure the plugin and a
-manual connection to the same hosted endpoint together.
+Existing output files refuse unless --overwrite is explicit. Tokens never
+belong in tool JSON or output. Cached byte delivery retains current paid access;
+status/cancel survive billing downgrade with remaining auth/policy enforced.
+These source changes do not claim package publication or actual runtime
+qualification. See the bundled native-projects playbook.
+
+The default profile includes standalone image capabilities and quotes. Start,
+progress, cancellation and private output retrieval use authenticated CLI
+`mcp call` or optional full-profile discovery. Inspect live availability
+and quote the exact model/variant count before approved spending. Preserve the
+request ID after uncertainty; generation creates raw media, separately from
+native project placement. Native Studio has no built-in image generator.
+Reference management and extended history remain available through authenticated
+operational CLI calls or the optional manual `--profile full` setup. Do not
+configure the plugin and a manual connection to the same endpoint together.
+
+MCP generation supports GPT Image 2 only: `gpt-image-2` with
+`gpt-image-2:direct:openai`, `direct`, `platform_credits`. Nano Banana quotes,
+generation, active draft selection and retries are rejected. Existing Nano runs,
+cancel/status and private output downloads remain available. A loaded stored Nano
+draft retains its content/revision and returns explicit model-selection guidance;
+select GPT before saving, preserving all other fields. No automatic conversion.
 
 ## Safety and source
 

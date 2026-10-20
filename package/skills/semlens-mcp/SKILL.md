@@ -1,6 +1,6 @@
 ---
 name: semlens-mcp
-description: Operate Semlens MCP for authorization, the Design Rule, Board research, editable design creation and editing, export, and publication preparation.
+description: Operate Semlens MCP for authorization, Board research, native project editing and private exports, uploads, Brand Kit and image generation.
 ---
 
 # Semlens MCP
@@ -49,8 +49,8 @@ Use the hosted endpoint `https://agents.semlens.com/api/mcp`.
    `status: "unchanged"`, confirms preservation.
 
 Complete Research Desk tabs are fixed responsibilities: Facts, Angles, and
-Caveats. Factual Research has no Angles and cannot create a design until expanded
-to a saved, validated complete package.
+Caveats. Factual Research has no Angles; expand it to a saved, validated complete
+package when structured Angles and Caveats are required.
 
 Research text saves reject media. Append one to twenty leads with
 `append_news_board_story_research_media`, exact fingerprints,
@@ -61,7 +61,7 @@ remains charged; retained media stays outside autofill.
 
 Do not send retired `images`, `imageCandidates`, `imageFill`,
 `imageCandidateId`, or `mediaCandidateId`; use uploaded media, Studio
-generation, or editor image tools separately after `research_images_retired`.
+generation, separately after `research_images_retired`.
 Use only accessible evidence,
 never send private Semlens context to external services, and never fabricate
 sources.
@@ -89,7 +89,7 @@ sources.
   inspection as completed ingestion.
 - Ingestion is a direct, zero-AI-credit account action with normal access,
   permission, owner, audit, approval, and media-verification gates. Reinspect
-  returned asset IDs and materialize their previews before design use.
+  returned asset IDs before further use.
 
 ## Brand Asset Ingestion
 
@@ -132,21 +132,34 @@ sources.
   Private attachments stay out of Trello; only bounded triage context and the
   evidence count are mirrored.
 
-## Designs
+## Native Projects
 
-- Factual Research alone cannot create a design. Expand it to a fully validated
-  and saved complete Research package first.
-- Create a new editable Generated Design from saved research only through
-  `create_design_from_story_research` after inspecting candidates and the
-  selected template's fields and validating fills with
-  `prepare_template_autofill`.
-- Read creation results from `creationSummary` and use its exact preview
-  operation for visual QA.
-- Edit an existing design through Agent Draft: prepare context, start a draft,
-  apply typed actions, inspect and preview, then commit only after the required
-  approval.
-- Direct editor commands remain appropriate for an explicitly requested
-  one-step edit when their own schema and authorization permit it.
+Normal setup includes the native workflow; no full-profile switch is needed.
+Create/open an owned project, retain runtimeGeneration, then read selected source
+and sidecar versions. Requested edits save directly with
+`save_native_project_files` or `save_native_project_sidecars` through canonical
+CAS/history. Do not require a separate manual proposal decision or forge approval.
+Import selected owned assets with `import_native_project_asset`; use its verified
+relative reference/receipt. List/install the pinned Catalog through native tools.
+
+Only on explicit preview-before-save intent, stage `preview_native_project_candidate`.
+Inspect/cancel its exact reference; `save_native_project_candidate` later saves
+those same verified bytes. Preview leaves saved source/history unchanged.
+
+Use `lint_native_project_html` for selected-html-static findings and exact file
+versions. Full executable `check_native_project` is unsupported/unqualified;
+never claim runtime/layout/contrast validation or automatically repair files.
+Capture/export are explicit jobs. Keep operation/job/input bindings; inspect
+status, distinguish cancel requested from termination confirmed, and preserve
+UNKNOWN without blind replay. Private results require current OAuth and paid
+access even when cached. Status/cancel survive billing downgrade, with current
+authentication and applicable account permissions still enforced.
+
+Use the existing authenticated CLI `mcp call` with `--output-file` for completed
+private PNG/MP4 results. Descriptors are selectors, not public bearer URLs; never
+put credentials in tool JSON. Gallery PNG preview publication is a separate
+explicit operation, not social posting. See [native projects](playbooks/native-projects.md).
+Actual local/runtime qualification and production release remain separate gates.
 
 ## Signals And Feeds
 
@@ -170,10 +183,10 @@ sources.
 
 ## Playbooks
 
+- [Native projects](playbooks/native-projects.md)
+
 - [first-safe-check.md](playbooks/first-safe-check.md)
-- [story-to-design.md](playbooks/story-to-design.md)
-- [design-draft-preview.md](playbooks/design-draft-preview.md)
-- [export-and-publish.md](playbooks/export-and-publish.md)
+- [research.md](playbooks/research.md)
 - [submit-feedback.md](playbooks/submit-feedback.md)
 - [image-generation.md](playbooks/image-generation.md)
 - [troubleshooting.md](playbooks/troubleshooting.md)

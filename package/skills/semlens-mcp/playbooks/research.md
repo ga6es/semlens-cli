@@ -1,6 +1,6 @@
-# Story To Design
+# Board Research
 
-Use this workflow for Board research and a new editable design.
+Use this workflow to inspect, validate and save owner-scoped Board research.
 
 ## Research
 
@@ -12,7 +12,7 @@ top-level `expectedUpdatedAt`, `artifactFingerprint`, and `freshnessToken`.
 New artifacts use null revision fields. Re-inspect and rebuild on stale context.
 Do not add Angles or use `packageFingerprint` for a factual save.
 
-Below is complete Research, required before design creation.
+Below is the complete Research workflow.
 
 1. Run `inspect_mcp_authorization_status`; stop if live Board research is
    unavailable.
@@ -40,28 +40,5 @@ Factual saves do not accept media leads.
 
 - Do not send retired `images`, `imageCandidates`, `imageFill`,
   `imageCandidateId`, or `mediaCandidateId` fields. The server returns
-  `research_images_retired`; use uploaded images, Studio generation, or editor
-  image tools as separate operations.
-- Designs for finished Generated Designs and workspace/design creation, with
-  templates as starting points, not a persisted suggestions section.
-
-## New Design
-
-1. Reuse saved research and stop if `currentPackageDraft` already identifies
-   the intended draft.
-2. Inspect a compact template shortlist, then inspect fields only for the
-   selected template.
-3. Map grounded content to exact `sourceFieldId` values and run
-   `prepare_template_autofill`. Revise any field rejected for visual capacity.
-4. Call `create_design_from_story_research` with current research/template
-   tokens, canonical text fills, and a fresh idempotency key.
-5. Read `creationSummary` and use its exact page-preview operation for visual
-   QA. Do not silently retry with another template or mapping.
-
-## Existing Designs
-
-Use Agent Draft for multi-step edits; direct commands only for authorized,
-explicit one-step edits. The existing-page story planner is retired.
-
-Never fabricate evidence, infer disabled Rules, send arbitrary media URLs, or
-publish/export without the required authorization and approval.
+  `research_images_retired`; use uploaded images, standalone image generation as
+  separate operations.

@@ -18,6 +18,8 @@ import {
 } from "./manifest.js"
 import { inspectAuthorizationServerMetadata } from "./oauth-metadata.js"
 import { parseSafeMcpUrl } from "./safe-mcp-url.js"
+import { createCodexApprovalEvidenceChecks, readCodexApprovalContext } from "./codex-approval-policy.js"
+import { SEMLENS_CODEX_APPROVAL_GUIDANCE } from "./public-compatibility.js"
 
 type CliCheckStatus = "fail" | "not_checked" | "pass" | "warn"
 
@@ -91,7 +93,7 @@ function parseArgs(argv: readonly string[]): ParsedArgs {
     const withoutPrefix = value.slice(2)
     const equalsIndex = withoutPrefix.indexOf("=")
     if (equalsIndex !== -1) {
-      flags.set(
+      setParsedFlag(flags,
         withoutPrefix.slice(0, equalsIndex),
         withoutPrefix.slice(equalsIndex + 1),
       )
@@ -100,15 +102,20 @@ function parseArgs(argv: readonly string[]): ParsedArgs {
 
     const nextValue = argv[index + 1]
     if (nextValue && !nextValue.startsWith("--")) {
-      flags.set(withoutPrefix, nextValue)
+      setParsedFlag(flags, withoutPrefix, nextValue)
       index += 1
       continue
     }
 
-    flags.set(withoutPrefix, true)
+    setParsedFlag(flags, withoutPrefix, true)
   }
 
   return { command, flags }
+}
+
+function setParsedFlag(flags: Map<string, string | true>, name: string, value: string | true) {
+  if (name.startsWith("codex-") && flags.has(name)) throw new Error("Duplicate Codex diagnostic flag.")
+  flags.set(name, value)
 }
 
 function readFlag(flags: Map<string, string | true>, name: string) {
@@ -356,7 +363,9 @@ function addDoctorClientConfigCheck(
     return
   }
   const configPath = resolveCodexConfigPath(readFlag(flags, "config"))
-  checks.push(...createCodexConfigChecks(inspectCodexConfigFile(configPath)))
+  const approvalContext = readCodexApprovalContext(flags)
+  const plan = inspectCodexConfigFile(configPath, "preserve", approvalContext)
+  checks.push(...createCodexConfigChecks(plan), ...(plan.approvalChecks ?? []), ...createCodexApprovalEvidenceChecks(approvalContext))
 }
 
 async function addDoctorMetadataChecks(checks: CliCheck[], endpoint: string) {
@@ -492,10 +501,19 @@ function addHostOwnedDoctorStages(checks: CliCheck[]) {
       name: "authorization inspection",
       status: "not_checked",
     },
+    {
+      message:
+        "Inspect currentAccount through this host's native Semlens connection. Standalone CLI login cannot verify the native account; compare only a user-supplied intended identity.",
+      name: "native account identity",
+      status: "not_checked",
+    },
   )
 }
 
 async function runDoctor(flags: Map<string, string | true>) {
+  if ([...flags.keys()].some(name => name.startsWith("codex-")) && readFlag(flags, "client") !== "codex") {
+    throw new Error("Codex approval diagnostic flags require --client codex.")
+  }
   const endpoint = readEndpoint(flags)
   const offline = hasFlag(flags, "offline")
   const checks: CliCheck[] = []
@@ -603,6 +621,12 @@ function hasFailures(checks: readonly CliCheck[]) {
 async function printDoctor(flags: Map<string, string | true>) {
   const result = await runDoctor(flags)
   const payload = {
+    setupHealth: hasFailures(result.checks)
+      ? "failed"
+      : result.checks.some((check) => check.status === "warn")
+        ? "attention_required"
+        : "healthy",
+    nativeAccountVerification: { status: "not_checked" },
     billingPath: SEMLENS_MCP_SERVER_MANIFEST.recoveryPaths.billing,
     checks: result.checks,
     docsUrl: `${PUBLIC_DOCS_ORIGIN}${DOCS_PATH}`,
@@ -633,7 +657,8 @@ async function printDoctor(flags: Map<string, string | true>) {
     process.stdout.write(
       "Features may require existing account entitlements. Diagnostics do not initiate purchases or upgrades.\n",
     )
-    process.stdout.write("Next: authenticate Semlens MCP in your agent.\n")
+    process.stdout.write(`Setup: ${payload.setupHealth}. Native account: NOT_CHECKED.\n`)
+    process.stdout.write("Next: inspect authorization through the affected host's native Semlens connection and compare its currentAccount with the user's intended identity, when supplied. Authenticate only for missing/invalid auth or an approved account switch; refresh a stale loaded connection with that host's supported controls.\n")
   }
   process.exitCode = hasFailures(result.checks) ? 1 : 0
 }
@@ -667,6 +692,8 @@ function printCodexSetup(args: CodexSetupArgs) {
       'default_tools_approval_mode = "writes"',
       "tool_timeout_sec = 120",
       ...profileLines,
+      "",
+      ...SEMLENS_CODEX_APPROVAL_GUIDANCE,
       "",
       "Then open Codex, authenticate Semlens MCP, and run /mcp to confirm it is connected.",
       "Compatible clients negotiate modern MCP automatically with stateless legacy fallback.",
@@ -906,6 +933,7 @@ function printHelp() {
       "  semlens feedback submit --summary <text> --report-file <path> --request-id <uuid> [--attachment-file <path>|--attachments-file <path>] --approve-write [--pathname <path>] [--endpoint <url>] [--timeout-ms <ms>] [--json]",
       "  semlens feedback status (--report-id <uuid>|--request-id <uuid>) [--endpoint <url>] [--timeout-ms <ms>] [--json]",
       "  semlens mcp doctor [--client codex] [--config <path>] [--endpoint <url>] [--offline] [--json] [--cli-version <x>] [--plugin-version <x>] [--skills-version <x>]",
+      "  Codex doctor evidence: [--codex-approval-policy <never|on-request>] [--codex-approval-rejected] [--codex-tool <name>] [--codex-profile <legacy-table-name>]",
       "  semlens mcp repair codex [--config <path>] [--profile <full|starter>] [--apply] [--json]",
       "  semlens mcp setup codex [--endpoint <url>] [--profile <full|starter>]",
       "  semlens mcp setup claude [--endpoint <url>]",
@@ -914,12 +942,7 @@ function printHelp() {
       "  semlens help",
       "",
       "Operational commands use the same authenticated Semlens MCP tools as connected agents.",
-      "create_design_export waits up to 10 minutes by default; --timeout-ms may shorten that wait. A timed-out write has an uncertain result; inspect recent MCP activity before requesting a fresh export.",
-      "For durable MP4 or mixed exports: start_design_video_export --approve-write, inspect_design_video_export with exportOperationId, then retrieve_design_video_export with --output-file or --output-directory. Replay the same start request instead of creating a duplicate render.",
-      "cancel_design_video_export --approve-write requests cancellation; inspect until terminal. Pending retrieval writes no local file; retry retrieval of an existing artifact after a local transfer failure.",
-      "Native preview images are written only when an explicit output path is supplied; existing files are preserved unless --overwrite is used for a single file.",
-      "Export output flags save ZIP/MP4 artifacts only and hide their signed URLs. PNG/JPG/PDF exports complete synchronously on the server, but the CLI cannot currently save those standalone export files; use an authorized MCP client supporting their file delivery and keep bearer URLs private.",
-      "Use videoOutputMode=mixed with staticFormat=png|jpg for an ordered ZIP of video and static pages; inspect pageResults and export-results.json before retrying failed pages.",
+      "Tool-result images and authenticated native PNG/MP4 results are written only to explicit output paths; native results verify size/hash and existing files refuse unless --overwrite is explicit.",
       "Do not place credentials, authorization codes, or signed capability URLs in --input; use owner-scoped tool IDs and bounded JSON only.",
       `Agent setup prompt: ${PUBLIC_DOCS_ORIGIN}${PROMPT_DOCS_PATH}`,
       "",
