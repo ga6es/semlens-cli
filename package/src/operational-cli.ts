@@ -12,7 +12,6 @@ import {
 } from "./operational-mcp.js"
 import { SEMLENS_MCP_SERVER_MANIFEST } from "./manifest.js"
 import { CliImageFileError } from "./image-files.js"
-import { CliExportFileError, validateExportOutputDestination } from "./export-files.js"
 import {
   inspectFeedbackStatus,
   readFeedbackSubmission,
@@ -27,6 +26,7 @@ import {
 } from "./media-upload.js"
 import { parseSafeMcpUrl } from "./safe-mcp-url.js"
 import { uploadStudioReference } from "./studio-reference-upload.js"
+import { CliNativeResultError } from "./native-result-files.js"
 import {
   ProtectedCredentialStore,
   SecureCredentialError,
@@ -36,7 +36,6 @@ import {
 const DEFAULT_OPERATION_TIMEOUT_MS = 30_000
 const MIN_TIMEOUT_MS = 1_000
 const MAX_TIMEOUT_MS = 120_000
-const MAX_EXPORT_TIMEOUT_MS = 600_000
 
 type ParsedOperationalFlags = {
   attachmentFile: string | null
@@ -291,11 +290,6 @@ type OperationalInvocation = {
 }
 
 export function resolveTimeoutPolicy(invocation: OperationalInvocation) {
-  if (invocation.group === "mcp" && invocation.toolName === "create_design_export") {
-    // A measured 22.94-second clip took 95.734 seconds to render and store.
-    // Keep the longer client wait exclusive to synchronous export creation.
-    return { defaultMs: MAX_EXPORT_TIMEOUT_MS, maxMs: MAX_EXPORT_TIMEOUT_MS }
-  }
   if (["media", "brand", "studio"].includes(invocation.group) ||
     (invocation.group === "feedback" && invocation.action === "submit")) {
     return { defaultMs: MAX_TIMEOUT_MS, maxMs: MAX_TIMEOUT_MS }
@@ -392,9 +386,9 @@ function readOperationalInvocation(
 function safeErrorCode(error: unknown) {
   if (
     error instanceof OperationalMcpError ||
-    error instanceof CliExportFileError ||
     error instanceof CliMediaUploadError ||
     error instanceof CliImageFileError ||
+    error instanceof CliNativeResultError ||
     error instanceof OAuthSessionError ||
     error instanceof SecureCredentialError
   ) {
@@ -516,19 +510,11 @@ async function runMcpCommand(
   toolName: string | undefined,
   flags: ParsedOperationalFlags,
 ) {
-  if (action === "call" && ["create_design_export", "retrieve_design_video_export"].includes(toolName ?? "") &&
-    (flags.outputDirectory || flags.outputFile)) {
-    await validateExportOutputDestination({
-      outputDirectory: flags.outputDirectory,
-      outputFile: flags.outputFile,
-      overwrite: flags.overwrite,
-    })
-  }
   return withEndpointCredentialLock(flags.endpoint, () =>
     withStoredConnection({
       endpoint: flags.endpoint,
       timeoutMs: flags.timeoutMs,
-      run: async (client, signal) => {
+      run: async (client, signal, provider) => {
         if (action === "capabilities") {
           return inspectCliCapabilities({
             client,
@@ -551,6 +537,11 @@ async function runMcpCommand(
           arguments: argumentsValue,
           client,
           endpoint: flags.endpoint,
+          getAccessToken: async () => {
+            const token = (await provider.tokens())?.access_token
+            if (!token) throw new OAuthSessionError("reauth_required")
+            return token
+          },
           outputDirectory: flags.outputDirectory,
           outputFile: flags.outputFile,
           overwrite: flags.overwrite,

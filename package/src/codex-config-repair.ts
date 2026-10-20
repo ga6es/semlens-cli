@@ -21,6 +21,7 @@ import {
   SEMLENS_MCP_STARTER_PROFILE_TOOL_NAMES,
 } from "./manifest.js"
 import { parseSafeMcpUrl } from "./safe-mcp-url.js"
+import { createCodexSavedApprovalChecks, type CodexApprovalCheck, type CodexApprovalContext } from "./codex-approval-policy.js"
 
 const MAX_CODEX_CONFIG_BYTES = 1_000_000
 const INVALID_SERVICE_TIER = "default"
@@ -48,6 +49,7 @@ export type CodexConfigRepairAction =
 export type CodexConfigProfileIntent = "full" | "preserve" | "starter"
 
 export type CodexConfigRepairPlan = {
+  approvalChecks?: CodexApprovalCheck[]
   actions: CodexConfigRepairAction[]
   diagnostics: CodexConfigDiagnosticCode[]
   safeToApply: boolean
@@ -508,6 +510,7 @@ export function resolveCodexConfigPath(overridePath: string | null) {
 export function inspectCodexConfigFile(
   configPath: string,
   profileIntent: CodexConfigProfileIntent = "preserve",
+  approvalContext?: CodexApprovalContext,
 ) {
   if (!existsSync(configPath)) {
     return {
@@ -536,7 +539,10 @@ export function inspectCodexConfigFile(
     return blockedPlan(["config_not_utf8"])
   }
 
-  return planCodexConfigRepair(source, profileIntent)
+  return {
+    ...planCodexConfigRepair(source, profileIntent),
+    ...(approvalContext ? { approvalChecks: createCodexSavedApprovalChecks(source, approvalContext) } : {}),
+  }
 }
 
 function createBackupPath(configPath: string) {
