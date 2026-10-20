@@ -182,12 +182,12 @@
     },
     {
       "path": "tests/oauth-issuer.test.ts",
-      "sha256": "2fd365e30158eeb5ffbad44ac104b5dbc7af3b05062b0b84d52dfa609b8f815e"
+      "sha256": "969fde0590b7645ac1d8bfa12a6599db45f5129d3100031855d57e9cc137732e"
     }
   ],
   "schemaVersion": 1,
   "source": {
-    "commit": "12189a7ea2fd8a9356b57aa4d2f2c362a83621c5",
+    "commit": "e9771e2ac9a94de269dd0c9f5dab96bcbb203a6f",
     "repository": "ga6es/desk-rules",
     "root": "packages/cli"
   }

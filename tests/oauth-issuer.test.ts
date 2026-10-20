@@ -165,7 +165,7 @@ async function sendFixtureMcp(url: string, fetchImplementation?: typeof fetch) {
 function refreshFixtureToken(origin: string, tokenEndpoint: string, fetchFn: typeof fetch) {
   return refreshAuthorization(origin, {
     refreshToken: "fixture-refresh", clientInformation: { client_id: "fixture-client", client_secret: "fixture-secret", issuer: origin },
-    metadata: { issuer: origin, token_endpoint: tokenEndpoint, response_types_supported: ["code"], token_endpoint_auth_methods_supported: ["client_secret_post"] },
+    metadata: { issuer: origin, authorization_endpoint: `${origin}/authorize`, token_endpoint: tokenEndpoint, response_types_supported: ["code"], token_endpoint_auth_methods_supported: ["client_secret_post"] },
     fetchFn,
   })
 }
