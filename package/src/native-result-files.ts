@@ -7,7 +7,7 @@ const MAX_BYTES = 128 * 1024 * 1024
 export class CliNativeResultError extends Error {
   constructor(readonly code: "native_output_invalid" | "native_output_conflict" | "native_output_unavailable") { super(code) }
 }
-type Artifact = { bytes: number; sha256: string; mediaType: "image/png" | "video/mp4"; resource: { uri: string } }
+type Artifact = { bytes: number; sha256: string; mediaType: "image/png" | "image/jpeg" | "application/zip" | "video/mp4" | "audio/mpeg"; resource: { uri: string } }
 const record = (value: unknown): value is Record<string, unknown> => Boolean(value) && typeof value === "object" && !Array.isArray(value)
 
 function readArtifact(result: CallToolResult): Artifact {
@@ -16,7 +16,7 @@ function readArtifact(result: CallToolResult): Artifact {
   const artifact = value.kind === "native-job-result" ? value : value.artifact
   if (!record(artifact) || !Number.isSafeInteger(artifact.bytes) || Number(artifact.bytes) <= 0 || Number(artifact.bytes) > MAX_BYTES
     || typeof artifact.sha256 !== "string" || !/^[a-f0-9]{64}$/.test(artifact.sha256)) throw new CliNativeResultError("native_output_invalid")
-  if (!["image/png", "video/mp4"].includes(String(artifact.mediaType)) || !record(artifact.resource)
+  if (!["image/png", "image/jpeg", "application/zip", "video/mp4", "audio/mpeg"].includes(String(artifact.mediaType)) || !record(artifact.resource)
     || artifact.resource.authentication !== "current-oauth-bearer" || typeof artifact.resource.uri !== "string") throw new CliNativeResultError("native_output_invalid")
   return artifact as unknown as Artifact
 }
@@ -57,7 +57,7 @@ export async function saveNativeToolResult(input: {
   const artifact = readArtifact(input.result)
   const url = privateUrl(artifact.resource.uri, input.endpoint)
   const targetPath = resolve(input.outputFile)
-  const extension = artifact.mediaType === "image/png" ? ".png" : ".mp4"
+  const extension = { "image/png": ".png", "image/jpeg": ".jpg", "application/zip": ".zip", "video/mp4": ".mp4", "audio/mpeg": ".mp3" }[artifact.mediaType]
   if (extname(targetPath).toLowerCase() !== extension || basename(targetPath).length > 240
     || !(await stat(dirname(targetPath))).isDirectory()) throw new CliNativeResultError("native_output_invalid")
   const tempPath = join(dirname(targetPath), `.${basename(targetPath)}.${randomBytes(8).toString("hex")}.tmp`)

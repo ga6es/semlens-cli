@@ -159,6 +159,11 @@ Use the existing authenticated CLI `mcp call` with `--output-file` for completed
 private PNG/MP4 results. Descriptors are selectors, not public bearer URLs; never
 put credentials in tool JSON. Gallery PNG preview publication is a separate
 explicit operation, not social posting. See [native projects](playbooks/native-projects.md).
+For narration/transcription, inspect availability and quote the exact input.
+Explain the returned credit cost and submit the unchanged quote only with
+spending approval, including an existing explicit budget covering that action
+and cost. Reconfirm only when that scope or cost exceeds the authorization.
+Use TTS alignment for its captions without another transcription charge.
 Actual local/runtime qualification and production release remain separate gates.
 
 ## Signals And Feeds
