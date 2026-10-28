@@ -79,6 +79,16 @@ export const SEMLENS_PUBLIC_COMPATIBILITY = {
             "inspect_native_project_result",
             "publish_native_project_preview",
             "check_native_project",
+            "inspect_native_speech_configuration",
+            "quote_native_project_speech",
+            "submit_native_project_speech",
+            "inspect_native_project_speech",
+            "cancel_native_project_speech",
+            "verify_native_project_speech",
+            "apply_native_project_speech",
+            "retrieve_native_project_speech_audio",
+            "recover_native_project_speech_intent",
+            "prepare_native_project_media_upload",
         ],
     },
     protocolCompatibility: {
@@ -118,7 +128,7 @@ export const SEMLENS_PUBLIC_COMPATIBILITY = {
     serverName: "semlens-mcp",
     versions: {
         cli: {
-            current: "0.5.4",
+            current: "0.5.5",
             minimumCompatible: "0.5.0",
             published: "",
         },

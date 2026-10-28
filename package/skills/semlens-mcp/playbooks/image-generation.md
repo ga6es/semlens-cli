@@ -29,8 +29,8 @@ set `activeWorkflow` to `image` for workspace drafts, then save with `expectedRe
 - Retrieve the matching owner-private PNG/JPEG/WebP with
   `retrieve_studio_output_content`; the authenticated CLI `mcp call` supports
   `--output-file` for durable delivery. Preserve output and history records.
-- Generation creates raw media. Native placement is a separate owner-authorized
+- MCP generation creates raw media. Native placement is a separate owner-authorized
   import through the canonical native file/history boundary. Native Studio has
-  no built-in image generator or website agent. Do not restore a legacy document
-  bridge, promise automatic placement, or treat registered tools as proof of
-  actual generation, debit or runtime readiness.
+  its own image-generation UI, while this MCP workflow has no website agent.
+  Do not restore a legacy document bridge, promise automatic placement, or treat
+  registered tools as proof of actual generation, debit or runtime readiness.

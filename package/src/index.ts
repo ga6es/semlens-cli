@@ -650,7 +650,7 @@ async function printDoctor(flags: Map<string, string | true>) {
       `Protocol: MCP ${payload.protocolCompatibility.modern.protocolVersion} with automatic stateless legacy fallback\n`,
     )
     process.stdout.write(
-      "MCP Tasks: not advertised; PNG/JPG/PDF synchronous; MP4/mixed-media jobs support start/status/retrieval/cancellation\n",
+      "MCP Tasks: not advertised; native still/image-ZIP/MP4 jobs support start/status/retrieval/cancellation\n",
     )
     printChecks(result.checks)
     process.stdout.write(`Docs: ${payload.docsUrl}\n`)
@@ -866,7 +866,7 @@ function printUpdateGuidance() {
       `Package manifest version: ${SEMLENS_MCP_SERVER_MANIFEST.manifestVersion}`,
       `Modern MCP protocol: ${SEMLENS_MCP_SERVER_MANIFEST.protocolCompatibility.modern.protocolVersion}`,
       `Legacy fallback: ${SEMLENS_MCP_SERVER_MANIFEST.protocolCompatibility.legacy.protocolVersion} (${SEMLENS_MCP_SERVER_MANIFEST.protocolCompatibility.legacy.mode})`,
-      "MCP Tasks: not advertised; PNG/JPG/PDF synchronous; MP4/mixed-media jobs support start/status/retrieval/cancellation",
+        "MCP Tasks: not advertised; native still/image-ZIP/MP4 jobs support start/status/retrieval/cancellation",
       "",
       "CLI one-time run:",
       `${SEMLENS_MCP_SERVER_MANIFEST.cli.npmRunCommand} mcp doctor`,
@@ -926,7 +926,7 @@ function printHelp() {
       "  semlens auth status [--endpoint <url>] [--timeout-ms <ms>] [--json]",
       "  semlens auth logout [--endpoint <url>] [--json]",
       "  semlens mcp capabilities [--operation <id,id,...>] [--endpoint <url>] [--timeout-ms <ms>] [--json]",
-      "  semlens mcp call <tool> (--input <json>|--input-file <path>) [--output-file <path>|--output-directory <path>] [--overwrite] [--approve-write|--approve-external] [--endpoint <url>] [--timeout-ms <ms>] [--json]",
+      "  semlens mcp call <tool> (--input <json>|--input-file <path>) [--output-file <path>|--output-directory <path>] [--file <native-media-path>] [--overwrite] [--approve-write|--approve-external] [--endpoint <url>] [--timeout-ms <ms>] [--json]",
       "  semlens media upload (--file <path> --request-id <uuid>|--batch-file <path>) --approve-write [--endpoint <url>] [--timeout-ms <ms>] [--json]",
       "  semlens brand upload (--kind <logo|font> --label <label> --file <path> --request-id <uuid>|--batch-file <path>) --approve-write [--endpoint <url>] [--timeout-ms <ms>] [--json]",
       "  semlens studio reference upload --file <path> --request-id <uuid> --approve-write [--endpoint <url>] [--timeout-ms <ms>] [--json]",
@@ -942,7 +942,8 @@ function printHelp() {
       "  semlens help",
       "",
       "Operational commands use the same authenticated Semlens MCP tools as connected agents.",
-      "Tool-result images and authenticated native PNG/MP4 results are written only to explicit output paths; native results verify size/hash and existing files refuse unless --overwrite is explicit.",
+        "Tool-result images and authenticated native PNG/JPG/ZIP/MP4/MP3 results are written only to explicit output paths; native results verify size/hash and existing files refuse unless --overwrite is explicit.",
+      "For prepare_native_project_media_upload, --file streams one local media file; input contains only projectId/runtimeGeneration. Local paths stay in the CLI.",
       "Do not place credentials, authorization codes, or signed capability URLs in --input; use owner-scoped tool IDs and bounded JSON only.",
       `Agent setup prompt: ${PUBLIC_DOCS_ORIGIN}${PROMPT_DOCS_PATH}`,
       "",

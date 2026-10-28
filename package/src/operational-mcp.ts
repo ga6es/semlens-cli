@@ -344,7 +344,7 @@ async function saveRequestedToolOutput(input: {
   getAccessToken?: () => Promise<string>
 }, result: CallToolResult) {
   if (!input.outputDirectory && !input.outputFile) return {}
-  if (["inspect_native_project_result", "inspect_native_project_candidate"].includes(input.toolName)) {
+  if (["inspect_native_project_result", "inspect_native_project_candidate", "retrieve_native_project_speech_audio"].includes(input.toolName)) {
     if (!input.outputFile || input.outputDirectory || !input.endpoint || !input.getAccessToken) throw new OperationalMcpError("input_invalid")
     return { nativeFile: await saveNativeToolResult({ endpoint: input.endpoint, result, outputFile: input.outputFile,
       overwrite: input.overwrite ?? false, signal: input.signal, getAccessToken: input.getAccessToken }) }
@@ -372,7 +372,7 @@ export async function executeRegisteredTool(input: {
   getAccessToken?: () => Promise<string>
 }) {
   const { capability, result } = await executeRegisteredToolRaw(input)
-  const savedOutput = await saveRequestedToolOutput(input, result)
+  const savedOutput = toolResultOk(result) ? await saveRequestedToolOutput(input, result) : {}
   return {
     approvalClass: capability.approvalClass,
     ...savedOutput,

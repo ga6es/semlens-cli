@@ -27,6 +27,7 @@ import {
 import { parseSafeMcpUrl } from "./safe-mcp-url.js"
 import { uploadStudioReference } from "./studio-reference-upload.js"
 import { CliNativeResultError } from "./native-result-files.js"
+import { uploadNativeMediaFile } from "./native-media-upload.js"
 import {
   ProtectedCredentialStore,
   SecureCredentialError,
@@ -102,6 +103,7 @@ const CALL_FLAGS = new Set([
   "approve-external",
   "approve-write",
   "endpoint",
+  "file",
   "input",
   "input-file",
   "json",
@@ -291,6 +293,8 @@ type OperationalInvocation = {
 
 export function resolveTimeoutPolicy(invocation: OperationalInvocation) {
   if (["media", "brand", "studio"].includes(invocation.group) ||
+    (invocation.group === "mcp" && invocation.action === "call" &&
+      ["quote_native_project_speech", "verify_native_project_speech", "apply_native_project_speech"].includes(invocation.toolName ?? "")) ||
     (invocation.group === "feedback" && invocation.action === "submit")) {
     return { defaultMs: MAX_TIMEOUT_MS, maxMs: MAX_TIMEOUT_MS }
   }
@@ -529,6 +533,17 @@ async function runMcpCommand(
           inputFile: flags.inputFile,
           inputJson: flags.inputJson,
         })
+        if (flags.file) {
+          if (toolName !== "prepare_native_project_media_upload" || flags.outputFile || flags.outputDirectory || flags.overwrite) {
+            throw new OperationalMcpError("input_invalid")
+          }
+          return uploadNativeMediaFile({ client, endpoint: flags.endpoint, target: argumentsValue, file: flags.file,
+            approveWrite: flags.approveWrite, signal, getAccessToken: async () => {
+              const token = (await provider.tokens())?.access_token
+              if (!token) throw new OAuthSessionError("reauth_required")
+              return token
+            } })
+        }
         return executeRegisteredTool({
           approvals: {
             external: flags.approveExternal,

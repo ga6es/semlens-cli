@@ -216,7 +216,7 @@ capabilities. Inspect the live capability manifest before requesting asset pixel
 
 ## Compatibility
 
-- Prepared Semlens CLI package version: `0.5.4` (publication pending)
+- Prepared Semlens CLI package version: `0.5.5` (publication pending)
 - Historical Desk Rules package: `@desk-rules/cli` version `0.2.4`
 - Minimum compatible CLI contract: `0.5.0`
 - Current plugin and bundled skill contract: `0.5.1` (publication pending)
@@ -238,12 +238,19 @@ Host invocation approval and account permissions still apply. Full executable
 check is unsupported; selected HTML static lint is narrower. Keep operation/job
 identity, exact versions and UNKNOWN evidence instead of blind retries.
 
+Speech quote, verification and application calls default to a 120-second
+client deadline to allow cold audio preparation. Session expiry and cancellation
+can end them sooner. On a timeout, retain the operation and read its state
+before retrying; a timeout does not prove that nothing ran.
+
 Private native results use the current authenticated connection, not a public
 URL. The existing command writes only after bounded size/hash verification:
 
 ```sh
 semlens mcp call inspect_native_project_result --input-file job.json --output-file result.mp4
+semlens mcp call inspect_native_project_result --input-file image-job.json --output-file images.zip
 semlens mcp call inspect_native_project_candidate --input-file candidate.json --output-file preview.png
+semlens mcp call retrieve_native_project_speech_audio --input-file speech-result.json --output-file voiceover.mp3
 ```
 
 Existing output files refuse unless --overwrite is explicit. Tokens never
@@ -252,12 +259,25 @@ status/cancel survive billing downgrade with remaining auth/policy enforced.
 These source changes do not claim package publication or actual runtime
 qualification. See the bundled native-projects playbook.
 
+To import a local media file, `target.json` contains only the currently prepared
+`projectId` and `runtimeGeneration`:
+
+```sh
+semlens mcp call prepare_native_project_media_upload --input-file target.json --file ./audio.mp3 --approve-write
+```
+
+The CLI keeps the local path private, commits the filename/size/SHA-256, then
+streams the file with current OAuth to the same endpoint. The existing native
+publisher creates the project asset and history receipt without overwriting
+files. An uncertain transfer requires receipt readback before an exact retry.
+
 The default profile includes standalone image capabilities and quotes. Start,
 progress, cancellation and private output retrieval use authenticated CLI
 `mcp call` or optional full-profile discovery. Inspect live availability
 and quote the exact model/variant count before approved spending. Preserve the
 request ID after uncertainty; generation creates raw media, separately from
-native project placement. Native Studio has no built-in image generator.
+native project placement. Native Studio has its own image-generation UI; this
+MCP workflow remains separate.
 Reference management and extended history remain available through authenticated
 operational CLI calls or the optional manual `--profile full` setup. Do not
 configure the plugin and a manual connection to the same endpoint together.
