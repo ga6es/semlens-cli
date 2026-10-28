@@ -58,7 +58,7 @@
     },
     {
       "path": "package/README.md",
-      "sha256": "0c31ea05459672d0e25023989c7002397e9c534be0182ec33d3d1b9bfba31759"
+      "sha256": "d75233de5878f05400d3cef11870201fc8a989a8b9e541031f8d53370d11a938"
     },
     {
       "path": "package/package.json",
@@ -142,7 +142,7 @@
     },
     {
       "path": "package/src/operational-cli.ts",
-      "sha256": "f89c0fc1c876513be4f3464b805c7b31b0a63b349ea7a1558371726306d6637e"
+      "sha256": "5344ac9348d41820e42962dd771adfe9e10e94ac8c4582f6be0a932494304ec2"
     },
     {
       "path": "package/src/operational-mcp.ts",
@@ -191,7 +191,7 @@
   ],
   "schemaVersion": 1,
   "source": {
-    "commit": "47fdcf04a0eb3ecf726dfa88e58063147f728a97",
+    "commit": "05e9a20526c878faf52c8c3a811fbb1334622e5b",
     "repository": "ga6es/desk-rules",
     "root": "packages/cli"
   }

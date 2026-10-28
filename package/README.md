@@ -238,6 +238,11 @@ Host invocation approval and account permissions still apply. Full executable
 check is unsupported; selected HTML static lint is narrower. Keep operation/job
 identity, exact versions and UNKNOWN evidence instead of blind retries.
 
+Speech quote, verification and application calls default to a 120-second
+client deadline to allow cold audio preparation. Session expiry and cancellation
+can end them sooner. On a timeout, retain the operation and read its state
+before retrying; a timeout does not prove that nothing ran.
+
 Private native results use the current authenticated connection, not a public
 URL. The existing command writes only after bounded size/hash verification:
 

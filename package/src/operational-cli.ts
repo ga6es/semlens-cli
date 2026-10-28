@@ -293,6 +293,8 @@ type OperationalInvocation = {
 
 export function resolveTimeoutPolicy(invocation: OperationalInvocation) {
   if (["media", "brand", "studio"].includes(invocation.group) ||
+    (invocation.group === "mcp" && invocation.action === "call" &&
+      ["quote_native_project_speech", "verify_native_project_speech", "apply_native_project_speech"].includes(invocation.toolName ?? "")) ||
     (invocation.group === "feedback" && invocation.action === "submit")) {
     return { defaultMs: MAX_TIMEOUT_MS, maxMs: MAX_TIMEOUT_MS }
   }
