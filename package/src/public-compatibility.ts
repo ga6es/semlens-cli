@@ -31,7 +31,7 @@ export const SEMLENS_PUBLIC_COMPATIBILITY = {
         },
         updateContract: "CLI, plugins, skills, docs, smoke tests, and Account UI consume the public compatibility contract instead of inventing release metadata.",
     },
-    manifestVersion: "2026-10-19.mcp-gpt-image-only",
+    manifestVersion: "2026-10-29.native-exports",
     profiles: {
         starterTools: [
             "inspect_mcp_capabilities",
@@ -72,12 +72,10 @@ export const SEMLENS_PUBLIC_COMPATIBILITY = {
             "inspect_native_project_candidate",
             "cancel_native_project_candidate",
             "save_native_project_candidate",
-            "capture_native_project",
             "export_native_project",
             "inspect_native_project_job",
             "cancel_native_project_job",
             "inspect_native_project_result",
-            "publish_native_project_preview",
             "check_native_project",
             "inspect_native_speech_configuration",
             "quote_native_project_speech",

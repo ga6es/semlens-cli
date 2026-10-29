@@ -46,8 +46,7 @@
    Errors block; warnings/info advise. Full executable check_native_project is
    unsupported/unqualified, not a passed runtime/layout/contrast check. Repairs
    are deliberate source edits, never an automatic lint-repair mode.
-8. capture_native_project starts a saved-source PNG job. export_native_project
-   accepts preview.kind render-mp4 with renderProfile, or image-export with
+8. export_native_project accepts preview.kind render-mp4 with renderProfile, or image-export with
    imageExportRequest (compositionPath,format png/jpg/zip and exact frame/scenes
    selection). ZIP follows the frozen Studio scene order; selection chooses scenes and offsets. These share Studio's
    frozen exporters; no client conversion or second rendering service is used.
@@ -67,8 +66,6 @@
    The CLI verifies size/hash before publishing the local file; existing files
    refuse unless --overwrite is explicit. No credential is passed in JSON or
    printed. A candidate descriptor is not a saved-source result or public URL.
-10. publish_native_project_preview is an explicit best-effort gallery PNG action,
-    separate from job success and private downloads. It is not social publishing.
 
 ## Narration and captions
 
@@ -98,7 +95,7 @@ only rebinds a provably unadmitted intent after generation change; it refuses
 existing jobs/custody and does not quote, submit or renew the original authority.
 
 Create uses existing Create initial draft policy; edits use Edit existing designs;
-capture/export/results use Export files. Status/cancel survive billing downgrade;
+export/results use Export files. Status/cancel survive billing downgrade;
 revoked authentication or applicable account permission still refuses. Keep all
 accepted work/evidence. Source/controlled adapter checks do not establish actual
 local renderer/runtime, hosted rollout or package publication.

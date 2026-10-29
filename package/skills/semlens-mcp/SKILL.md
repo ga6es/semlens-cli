@@ -149,7 +149,7 @@ those same verified bytes. Preview leaves saved source/history unchanged.
 Use `lint_native_project_html` for selected-html-static findings and exact file
 versions. Full executable `check_native_project` is unsupported/unqualified;
 never claim runtime/layout/contrast validation or automatically repair files.
-Capture/export are explicit jobs. Keep operation/job/input bindings; inspect
+Exports are explicit jobs. Keep operation/job/input bindings; inspect
 status, distinguish cancel requested from termination confirmed, and preserve
 UNKNOWN without blind replay. Private results require current OAuth and paid
 access even when cached. Status/cancel survive billing downgrade, with current

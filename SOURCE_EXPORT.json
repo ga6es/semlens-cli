@@ -58,7 +58,7 @@
     },
     {
       "path": "package/README.md",
-      "sha256": "d75233de5878f05400d3cef11870201fc8a989a8b9e541031f8d53370d11a938"
+      "sha256": "412a9ebf62a44065c802035cfa4457486117a1a0ac1afa1c500d95be2c898ab9"
     },
     {
       "path": "package/package.json",
@@ -66,7 +66,7 @@
     },
     {
       "path": "package/skills/semlens-mcp/SKILL.md",
-      "sha256": "6293cd09927935fa17ee405c7df8700f82e4ccb510a332cedae5e67d9c8fe278"
+      "sha256": "f64332f1d7b8d32ff4b48285c182a80fd655ba53ca99342bbac7032869e5e5a8"
     },
     {
       "path": "package/skills/semlens-mcp/playbooks/first-safe-check.md",
@@ -78,7 +78,7 @@
     },
     {
       "path": "package/skills/semlens-mcp/playbooks/native-projects.md",
-      "sha256": "79fdd7cf758e3436d87c3827a88c52884512c790034d2fdf5b167b9ce5076d6a"
+      "sha256": "1d5bcbeea4808cbedee4f4bcd941fe38cb80bb0a0ebc71983803762f13116f4d"
     },
     {
       "path": "package/skills/semlens-mcp/playbooks/research.md",
@@ -150,7 +150,7 @@
     },
     {
       "path": "package/src/public-compatibility.ts",
-      "sha256": "ae64b1418bf3d28ce85e39ca482ec4e8a91e985a958dcea82a3d7dd3320d8d19"
+      "sha256": "e17a05bcc8e19f8e2927bb8c2e1c5a5c4b555721800731959e8703dfaf7dd8ac"
     },
     {
       "path": "package/src/safe-mcp-url.ts",
@@ -191,7 +191,7 @@
   ],
   "schemaVersion": 1,
   "source": {
-    "commit": "05e9a20526c878faf52c8c3a811fbb1334622e5b",
+    "commit": "a7de00c85908ee9ca41e50ef20789c0275973212",
     "repository": "ga6es/desk-rules",
     "root": "packages/cli"
   }
