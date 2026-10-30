@@ -216,7 +216,8 @@ capabilities. Inspect the live capability manifest before requesting asset pixel
 
 ## Compatibility
 
-- Prepared Semlens CLI package version: `0.5.5` (publication pending)
+- Prepared Semlens CLI package version: `0.5.6` (publication pending)
+- Published CLI: `0.5.5`; its older manifest is incompatible with the current server. The 0.5.6 candidate requires verification and a separately approved trusted publication before normal npm installation.
 - Historical Desk Rules package: `@desk-rules/cli` version `0.2.4`
 - Minimum compatible CLI contract: `0.5.0`
 - Current plugin and bundled skill contract: `0.5.1` (publication pending)
