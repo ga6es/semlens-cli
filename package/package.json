@@ -1,6 +1,6 @@
 {
   "name": "@semlens/cli",
-  "version": "0.5.5",
+  "version": "0.5.6",
   "description": "Authenticated Semlens MCP client, setup, diagnostics, and update guidance.",
   "type": "module",
   "private": false,

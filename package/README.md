@@ -137,7 +137,7 @@ or signed capability URLs in command arguments.
 
 Native edits save directly through registered tools under current account and
 invocation permissions. Optional unsaved candidate preview is separate from
-saving; capture/export/status/cancel/private results use exact job references.
+saving; export/status/cancel/private results use exact job references.
 The retired custom editor commands remain unavailable. Full executable check
 is unsupported, and source/controlled tests do not certify the actual runtime.
 
@@ -216,11 +216,12 @@ capabilities. Inspect the live capability manifest before requesting asset pixel
 
 ## Compatibility
 
-- Prepared Semlens CLI package version: `0.5.5` (publication pending)
+- Prepared Semlens CLI package version: `0.5.6` (publication pending)
+- Published CLI: `0.5.5`; its older manifest is incompatible with the current server. The 0.5.6 candidate requires verification and a separately approved trusted publication before normal npm installation.
 - Historical Desk Rules package: `@desk-rules/cli` version `0.2.4`
 - Minimum compatible CLI contract: `0.5.0`
 - Current plugin and bundled skill contract: `0.5.1` (publication pending)
-- Prepared MCP manifest: `2026-10-19.mcp-gpt-image-only`
+- Prepared MCP manifest: `2026-10-29.native-exports`
 - Protocol: MCP `2026-07-28` with automatic stateless legacy fallback
 
 Run `mcp doctor` when a server, plugin, CLI, or skill bundle looks stale. The
