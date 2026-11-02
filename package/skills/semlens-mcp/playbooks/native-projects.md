@@ -53,6 +53,13 @@
    Keep operationId/jobId/inputDigest/jobKind/generation; inspect status and
    cancel only that job. Exact retry returns its original job. UNKNOWN requires
    reconciliation; never stage a replacement or claim rollback/termination.
+   If a lost/UNKNOWN response omitted jobId/inputDigest, call
+   inspect_native_project_job with only projectId/runtimeGeneration/operationId.
+   It returns the original full reference and status only for the same current
+   owner/principal. Missing or ambiguous evidence remains UNKNOWN; retain the
+   UUID and inspect again without submitting a replacement. Full job references
+   remain supported. A private PNG/JPG frame or ordered ZIP uses frozen saved
+   source at admission and requires no publication.
 9. inspect_native_project_result verifies completed private bytes. Its descriptor
    needs the current authenticated connection and existing billing/export access,
    including cached bytes. For CLI output, use the same authenticated command:
