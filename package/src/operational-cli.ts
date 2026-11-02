@@ -37,6 +37,7 @@ import {
 const DEFAULT_OPERATION_TIMEOUT_MS = 30_000
 const MIN_TIMEOUT_MS = 1_000
 const MAX_TIMEOUT_MS = 120_000
+const NATIVE_TRANSFER_TIMEOUT_MS = 15 * 60_000
 
 type ParsedOperationalFlags = {
   attachmentFile: string | null
@@ -292,6 +293,10 @@ type OperationalInvocation = {
 }
 
 export function resolveTimeoutPolicy(invocation: OperationalInvocation) {
+  if (invocation.group === "mcp" && invocation.action === "call" &&
+    ["open_native_project", "prepare_native_project_media_upload", "export_native_project", "inspect_native_project_result"].includes(invocation.toolName ?? "")) {
+    return { defaultMs: NATIVE_TRANSFER_TIMEOUT_MS, maxMs: NATIVE_TRANSFER_TIMEOUT_MS }
+  }
   if (["media", "brand", "studio"].includes(invocation.group) ||
     (invocation.group === "mcp" && invocation.action === "call" &&
       ["quote_native_project_speech", "verify_native_project_speech", "apply_native_project_speech"].includes(invocation.toolName ?? "")) ||
