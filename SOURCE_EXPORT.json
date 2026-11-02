@@ -138,11 +138,11 @@
     },
     {
       "path": "package/src/oauth-session.ts",
-      "sha256": "a3b1719c0f3341c7b954c8001cb7ca58129772ffdee581163f4421c71817a8a5"
+      "sha256": "177ab3c4f6b68ad820a0cef1ad952877ba1edf8cb8a24546a9f0e47eac9d2766"
     },
     {
       "path": "package/src/operational-cli.ts",
-      "sha256": "1b373c0d772037cd0126783d74bb48812e9041e405d105baf0de83c8506023b3"
+      "sha256": "7f7595ea02130d6dd581b268bd30fb4d8b280916e4a4da9d72ed31d7ee407ae3"
     },
     {
       "path": "package/src/operational-mcp.ts",
@@ -195,7 +195,7 @@
   ],
   "schemaVersion": 1,
   "source": {
-    "commit": "2fc87832974349837e66a635470a9e596676f49a",
+    "commit": "9e4bfade410b106b3aa4014275ad2f1a269bfda8",
     "repository": "ga6es/desk-rules",
     "root": "packages/cli"
   }

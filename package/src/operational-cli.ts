@@ -38,6 +38,7 @@ const DEFAULT_OPERATION_TIMEOUT_MS = 30_000
 const MIN_TIMEOUT_MS = 1_000
 const MAX_TIMEOUT_MS = 120_000
 const NATIVE_TRANSFER_TIMEOUT_MS = 15 * 60_000
+const LONG_NATIVE_TOOLS = new Set(["open_native_project", "prepare_native_project_media_upload", "export_native_project", "inspect_native_project_result"])
 
 type ParsedOperationalFlags = {
   attachmentFile: string | null
@@ -294,7 +295,7 @@ type OperationalInvocation = {
 
 export function resolveTimeoutPolicy(invocation: OperationalInvocation) {
   if (invocation.group === "mcp" && invocation.action === "call" &&
-    ["open_native_project", "prepare_native_project_media_upload", "export_native_project", "inspect_native_project_result"].includes(invocation.toolName ?? "")) {
+    LONG_NATIVE_TOOLS.has(invocation.toolName ?? "")) {
     return { defaultMs: NATIVE_TRANSFER_TIMEOUT_MS, maxMs: NATIVE_TRANSFER_TIMEOUT_MS }
   }
   if (["media", "brand", "studio"].includes(invocation.group) ||
@@ -433,6 +434,7 @@ function printResult(value: Record<string, unknown>, json: boolean) {
 async function withStoredConnection<T>(input: {
   endpoint: string
   timeoutMs: number
+  minimumTokenValidityMs?: number
   run: (
     client: Awaited<ReturnType<typeof connectAuthenticatedMcp>>["client"],
     signal: AbortSignal,
@@ -443,11 +445,13 @@ async function withStoredConnection<T>(input: {
   const provider = await createStoredSessionProvider({
     endpoint: input.endpoint,
     signal,
+    minimumTokenValidityMs: input.minimumTokenValidityMs,
   })
   const connected = await connectAuthenticatedMcp({
     endpoint: input.endpoint,
     provider,
     signal,
+    tokenOnly: input.minimumTokenValidityMs !== undefined,
   })
   try {
     return await input.run(connected.client, signal, provider)
@@ -523,6 +527,7 @@ async function runMcpCommand(
     withStoredConnection({
       endpoint: flags.endpoint,
       timeoutMs: flags.timeoutMs,
+      minimumTokenValidityMs: action === "call" && LONG_NATIVE_TOOLS.has(toolName ?? "") ? flags.timeoutMs + 5_000 : undefined,
       run: async (client, signal, provider) => {
         if (action === "capabilities") {
           return inspectCliCapabilities({
