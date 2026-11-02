@@ -34,7 +34,7 @@
     },
     {
       "path": "README.md",
-      "sha256": "aca576bef70dd0c4bf143103421e464225362f8d09216465ec7e318f98f05559"
+      "sha256": "1a3b7807946086d60565cbff098ca0e62aa5b188f8f7d71dfb205d93a61519fa"
     },
     {
       "path": "SECURITY.md",
@@ -42,7 +42,7 @@
     },
     {
       "path": "package-lock.json",
-      "sha256": "82f3dfb93167543c2cc1cdbe3e548b1dfce4f497bafb87b4df06c82df796c164"
+      "sha256": "29d01da1e3dc1ce49ef270aa15d5ce18f4564d2bc345f94487a9a92a58cc7033"
     },
     {
       "path": "package.json",
@@ -58,11 +58,11 @@
     },
     {
       "path": "package/README.md",
-      "sha256": "feb23db4f1f82818e306eca173837f7973fd4c380aaaaf845e78acc0e7eae9a6"
+      "sha256": "21c107d7b43cc5ebb847f7f152277e72ea37c494e6463c5ee8e1e9d520e13d6e"
     },
     {
       "path": "package/package.json",
-      "sha256": "7eaea6bdeb6828d53eaa42177b5dcb64791d83dd4669dc49b0593041490da951"
+      "sha256": "d618e69c80dcbe77696aee13c33a7ab91fc1cbc84c41e00ef318b44a3d7f6abc"
     },
     {
       "path": "package/skills/semlens-mcp/SKILL.md",
@@ -78,7 +78,7 @@
     },
     {
       "path": "package/skills/semlens-mcp/playbooks/native-projects.md",
-      "sha256": "1d5bcbeea4808cbedee4f4bcd941fe38cb80bb0a0ebc71983803762f13116f4d"
+      "sha256": "fe1cbc5f2335b726dd8726f3d4fe6ae1d595b4b4ddd2237887a5dc054a5d7233"
     },
     {
       "path": "package/skills/semlens-mcp/playbooks/research.md",
@@ -150,7 +150,7 @@
     },
     {
       "path": "package/src/public-compatibility.ts",
-      "sha256": "99d6632d8b9f2c46b9c22214db179b015f2a5efdad96df92ccc12bb4316d586f"
+      "sha256": "521c1130c9dc47d58cf8d2fb232395265d2dfc613354cdc0da786994fb961f83"
     },
     {
       "path": "package/src/safe-mcp-url.ts",
@@ -158,7 +158,7 @@
     },
     {
       "path": "package/src/secure-credentials.ts",
-      "sha256": "dbe352878aa4be2e80679ea00c233b86613e9694388162fca732d871bd479fb8"
+      "sha256": "4d255090bc90eb0ffa28f47347f313ea15ecbeb6417f458c60e86d5184ed1fff"
     },
     {
       "path": "package/src/studio-reference-upload.ts",
@@ -185,13 +185,17 @@
       "sha256": "a3eb92e216840ebf48c17a4744cec5b44b4eb883f885bac65a9d753171ba7b0f"
     },
     {
+      "path": "tests/native-credential-store.mjs",
+      "sha256": "c08aa3c78965265f940066605b932ed3d17d93fb957036ec0776711ecd9bd311"
+    },
+    {
       "path": "tests/oauth-issuer.test.ts",
       "sha256": "969fde0590b7645ac1d8bfa12a6599db45f5129d3100031855d57e9cc137732e"
     }
   ],
   "schemaVersion": 1,
   "source": {
-    "commit": "065092ea8ebb831fa2626839e6ec81befa90ef52",
+    "commit": "21ef460b6e4ab55661ca8722ce7e2a442f63c6cb",
     "repository": "ga6es/desk-rules",
     "root": "packages/cli"
   }

@@ -215,7 +215,7 @@ function parseCleanupLedger(value: string): CredentialCleanupLedger {
 }
 
 async function createSystemEntry(account: string): Promise<CredentialEntry> {
-  if (process.platform !== "win32") {
+  if (process.platform !== "win32" && process.platform !== "darwin") {
     throw new SecureCredentialError("unsupported_platform")
   }
   try {

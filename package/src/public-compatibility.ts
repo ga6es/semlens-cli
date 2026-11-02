@@ -126,9 +126,9 @@ export const SEMLENS_PUBLIC_COMPATIBILITY = {
     serverName: "semlens-mcp",
     versions: {
         cli: {
-            current: "0.5.6",
+            current: "0.5.7",
             minimumCompatible: "0.5.0",
-            published: "0.5.5",
+            published: "0.5.6",
         },
         plugin: {
             current: "0.5.1",

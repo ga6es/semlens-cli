@@ -113,7 +113,8 @@ bounded recovery path.
 
 Operational commands use OAuth PKCE and the same registered MCP tools as
 connected agents. Windows credentials are stored in Windows Credential Manager;
-the CLI fails closed when the protected store is unavailable. Login opens the
+macOS credentials use Apple Keychain through the same protected-store adapter.
+The CLI fails closed when the protected store is unavailable. Login opens the
 system browser and accepts one bounded loopback callback. `auth status` reports
 stored and server-verified state separately. `auth logout` removes local
 credentials and reports remote revocation as not attempted.
@@ -122,8 +123,17 @@ committed session until the replacement is verified. A keyring failure during
 the final protected-store commit can leave its outcome uncertain; rerun
 `auth status` before retrying login. A corrupt credential manifest fails closed rather than guessing which entries to
 delete. If logout reports `credential_store_corrupt`, use Windows Credential
-Manager to remove only the affected Semlens CLI entries; do not clear other
-applications' credentials. Native keyring recovery and hosted OAuth still require
+Manager or macOS Keychain Access to remove only Semlens CLI entries under
+`com.semlens.cli.oauth` whose account starts with the SHA-256 hash of the exact
+MCP endpoint URL used by that login. Compute this non-secret account prefix with:
+
+```sh
+node -e "console.log(require('node:crypto').createHash('sha256').update(process.argv[1]).digest('hex'))" https://agents.semlens.com/api/mcp
+```
+
+Use the exact custom endpoint instead if applicable. Do not delete entries when
+the service and account prefix cannot be matched; do not clear other endpoints'
+or applications' credentials. Native keyring recovery and hosted OAuth still require
 environment-specific verification; the automated lifecycle checks use fixtures.
 Remote OAuth discovery accepts named HTTPS hosts, not IP literals or local
 hostnames. An explicitly local MCP endpoint permits loopback OAuth services.
@@ -216,8 +226,8 @@ capabilities. Inspect the live capability manifest before requesting asset pixel
 
 ## Compatibility
 
-- Prepared Semlens CLI package version: `0.5.6` (publication pending)
-- Published CLI: `0.5.5`; its older manifest is incompatible with the current server. The 0.5.6 candidate requires verification and a separately approved trusted publication before normal npm installation.
+- Prepared Semlens CLI package version: `0.5.7` (publication pending)
+- Published CLI: `0.5.6`. The 0.5.7 candidate adds macOS credential-store routing and requires real-Mac verification plus separately approved trusted publication before normal npm installation.
 - Historical Desk Rules package: `@desk-rules/cli` version `0.2.4`
 - Minimum compatible CLI contract: `0.5.0`
 - Current plugin and bundled skill contract: `0.5.1` (publication pending)
@@ -295,7 +305,7 @@ select GPT before saving, preserving all other fields. No automatic conversion.
 - No postinstall script.
 - No backend secrets or local stdio customer setup.
 - No plaintext credential fallback and no token, callback, or signed-capability output.
-- Operational support is Windows-first in this prepared release; other OS credential stores are not yet claimed.
+- The protected-store adapter supports Windows Credential Manager and macOS Keychain. Other platforms return `unsupported_platform`; no plaintext fallback is used. Real-Mac Keychain and authenticated-command acceptance remains pending for this candidate.
 - Malformed, ambiguous, local stdio, and unsupported Codex configs fail closed.
 - Configuration/profile changes never grant account write access.
 
