@@ -150,7 +150,7 @@
     },
     {
       "path": "package/src/public-compatibility.ts",
-      "sha256": "521c1130c9dc47d58cf8d2fb232395265d2dfc613354cdc0da786994fb961f83"
+      "sha256": "2c0edf220499d2d9ab725985eea5efcd02644282b3e72c28220761415f1571cb"
     },
     {
       "path": "package/src/safe-mcp-url.ts",
@@ -195,7 +195,7 @@
   ],
   "schemaVersion": 1,
   "source": {
-    "commit": "48872314f17fbc0489b8f6c21589a3c6639f61d3",
+    "commit": "2fc87832974349837e66a635470a9e596676f49a",
     "repository": "ga6es/desk-rules",
     "root": "packages/cli"
   }
