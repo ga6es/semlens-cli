@@ -95,6 +95,9 @@ export async function uploadNativeMediaFile(input: {
   const selection = await inspectFile(input.file, input.target, input.signal)
   const prepared = await executeRegisteredToolRaw({ client: input.client, toolName, arguments: selection,
     approvals: { external: false, write: input.approveWrite }, signal: input.signal })
+  if (prepared.result.isError && record(prepared.result.structuredContent) && prepared.result.structuredContent.code === "native_video_upload_too_large") {
+    return { ok: false, operationId: toolName, result: sanitizeMachineValue(prepared.result) }
+  }
   const uri = committedTransfer(prepared.result, selection)
   const endpoint = new URL(input.endpoint), url = new URL(uri, endpoint)
   if (url.origin !== endpoint.origin || endpoint.username || endpoint.password) throw new OperationalMcpError("input_invalid")

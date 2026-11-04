@@ -122,7 +122,7 @@
     },
     {
       "path": "package/src/native-media-upload.ts",
-      "sha256": "22c8c4bb2e326e8ff7851f25292ad784deaa15a0c16cd0d12f4ecc666e6b4a11"
+      "sha256": "1a0a539813a76364e058661ab3e2b38c5de085cb1c65ba700167a5d3b3aa4adf"
     },
     {
       "path": "package/src/native-result-files.ts",
@@ -195,7 +195,7 @@
   ],
   "schemaVersion": 1,
   "source": {
-    "commit": "9e4bfade410b106b3aa4014275ad2f1a269bfda8",
+    "commit": "865eea38f113dcab7c4a8b8728592dc017abcdd5",
     "repository": "ga6es/desk-rules",
     "root": "packages/cli"
   }
