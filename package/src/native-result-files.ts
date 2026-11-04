@@ -3,7 +3,6 @@ import { constants, link, open, rename, stat, unlink } from "node:fs/promises"
 import { basename, dirname, extname, join, resolve } from "node:path"
 import type { CallToolResult } from "@modelcontextprotocol/client"
 
-const MAX_BYTES = 128 * 1024 * 1024
 export class CliNativeResultError extends Error {
   constructor(readonly code: "native_output_invalid" | "native_output_conflict" | "native_output_unavailable") { super(code) }
 }
@@ -14,7 +13,9 @@ function readArtifact(result: CallToolResult): Artifact {
   const value = result.structuredContent
   if (result.isError || !record(value) || value.ok !== true) throw new CliNativeResultError("native_output_unavailable")
   const artifact = value.kind === "native-job-result" ? value : value.artifact
-  if (!record(artifact) || !Number.isSafeInteger(artifact.bytes) || Number(artifact.bytes) <= 0 || Number(artifact.bytes) > MAX_BYTES
+  // Artifact capacity belongs to the server. Downloads already stream to a
+  // private temporary file and publish only after exact length/hash verification.
+  if (!record(artifact) || !Number.isSafeInteger(artifact.bytes) || Number(artifact.bytes) <= 0
     || typeof artifact.sha256 !== "string" || !/^[a-f0-9]{64}$/.test(artifact.sha256)) throw new CliNativeResultError("native_output_invalid")
   if (!["image/png", "image/jpeg", "application/zip", "video/mp4", "audio/mpeg"].includes(String(artifact.mediaType)) || !record(artifact.resource)
     || artifact.resource.authentication !== "current-oauth-bearer" || typeof artifact.resource.uri !== "string") throw new CliNativeResultError("native_output_invalid")

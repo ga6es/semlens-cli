@@ -3,6 +3,9 @@ import { createServer, type Server } from "node:http"
 import {
   Client,
   IssuerMismatchError,
+  OAuthError,
+  OAuthErrorCode,
+  refreshAuthorization,
   StreamableHTTPClientTransport,
   UnauthorizedError,
   type FetchLike,
@@ -27,6 +30,8 @@ const CALLBACK_PATH = "/oauth/callback"
 // Native OAuth callbacks use an available OS-assigned loopback port (RFC 8252).
 const CALLBACK_PORT = 0
 const MAX_CALLBACK_URL_LENGTH = 8_192
+const REJECTED_REFRESH_CODES = new Set<string>([OAuthErrorCode.InvalidGrant, OAuthErrorCode.InvalidClient,
+  OAuthErrorCode.UnauthorizedClient, OAuthErrorCode.InvalidDpopProof])
 
 export class OAuthSessionError extends Error {
   constructor(
@@ -63,6 +68,16 @@ function readStampedIssuer(value: unknown) {
   return value && typeof value === "object" && "issuer" in value
     ? String((value as { issuer?: unknown }).issuer ?? "")
     : ""
+}
+
+function accessTokenExpiresAt(token: string) {
+  // This is only a scheduling hint. The server still verifies the token and
+  // freezes its actual expiry; a decoded claim never grants authority.
+  try {
+    const payload = JSON.parse(Buffer.from(token.split(".")[1] ?? "", "base64url").toString("utf8"))
+    return Number.isSafeInteger(payload.exp) && payload.exp > 0 && payload.exp <= 8_640_000_000_000
+      ? payload.exp * 1000 : 0
+  } catch { return 0 }
 }
 
 function resolveIssuer(
@@ -143,6 +158,39 @@ export class ProtectedOAuthProvider implements OAuthClientProvider {
     const accessToken = this.tokens()?.access_token
     if (!accessToken) throw new OAuthSessionError("reauth_required")
     return accessToken
+  }
+
+  async ensureTokenValidity(minimumMs: number, signal: AbortSignal) {
+    signal.throwIfAborted()
+    const state = this.discoveryState()
+    if (!state || !Number.isSafeInteger(minimumMs) || minimumMs <= 0) throw new OAuthSessionError("reauth_required")
+    const issuer = normalizeUrl(state.authorizationServerUrl)
+    await this.validateResourceURL(this.store.endpoint, this.session.resource)
+    const tokens = this.tokens({ issuer })
+    if (!tokens) throw new OAuthSessionError("reauth_required")
+    this.latestIssuer = issuer
+    if (accessTokenExpiresAt(tokens.access_token) - Date.now() >= minimumMs) return
+    const client = this.clientInformation({ issuer })
+    if (!tokens.refresh_token || !client) throw new OAuthSessionError("reauth_required")
+    const refreshed = await refreshAuthorization(issuer, {
+      metadata: state.authorizationServerMetadata, clientInformation: client,
+      refreshToken: tokens.refresh_token, resource: this.store.endpoint,
+      fetchFn: createBoundedFetch(signal, globalThis.fetch, this.store.endpoint),
+    }).catch(async (error: unknown) => {
+      if (!OAuthError.isInstance(error) || !REJECTED_REFRESH_CODES.has(error.code)) throw error
+      // Preserve the SDK's definitive-rejection cleanup for this issuer,
+      // without starting interactive authorization inside a native operation.
+      delete this.session.tokensByIssuer[issuer]
+      if (error.code === OAuthErrorCode.InvalidClient || error.code === OAuthErrorCode.UnauthorizedClient) {
+        delete this.session.clientInformationByIssuer[issuer]
+      }
+      this.latestIssuer = Object.keys(this.session.tokensByIssuer).at(-1) ?? null
+      await this.persist()
+      throw new OAuthSessionError("reauth_required")
+    })
+    await this.saveTokens(refreshed, { issuer })
+    signal.throwIfAborted()
+    if (accessTokenExpiresAt(refreshed.access_token) - Date.now() < minimumMs) throw new OAuthSessionError("reauth_required")
   }
 
   async saveTokens(
@@ -360,10 +408,13 @@ export async function connectAuthenticatedMcp(input: {
   endpoint: string
   provider: OAuthClientProvider
   signal: AbortSignal
+  tokenOnly?: boolean
 }) {
   const client = createMcpClient()
   const transport = new StreamableHTTPClientTransport(new URL(input.endpoint), {
-    authProvider: input.provider,
+    // Long operations refresh before dispatch. A later 401 must fail rather
+    // than silently renew credentials and replay a possibly accepted write.
+    authProvider: input.tokenOnly ? { token: async () => (await input.provider.tokens())?.access_token } : input.provider,
     fetch: createBoundedFetch(input.signal, globalThis.fetch, input.endpoint),
     maxStepUpRetries: 0,
     onInsufficientScope: "throw",
@@ -488,13 +539,14 @@ export async function createStoredSessionProvider(input: {
   endpoint: string
   signal?: AbortSignal
   store?: ProtectedCredentialStore
+  minimumTokenValidityMs?: number
 }) {
   const store = input.store ?? new ProtectedCredentialStore(input.endpoint)
   const session = await store.load(input.signal)
   if (!session || Object.keys(session.tokensByIssuer).length === 0) {
     throw new OAuthSessionError("reauth_required")
   }
-  return new ProtectedOAuthProvider(
+  const provider = new ProtectedOAuthProvider(
     store,
     session,
     `http://${CALLBACK_HOST}:${CALLBACK_PORT}${CALLBACK_PATH}`,
@@ -504,4 +556,8 @@ export async function createStoredSessionProvider(input: {
     },
     input.signal,
   )
+  if (input.minimumTokenValidityMs !== undefined) {
+    await provider.ensureTokenValidity(input.minimumTokenValidityMs, input.signal ?? AbortSignal.timeout(60_000))
+  }
+  return provider
 }
