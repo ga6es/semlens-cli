@@ -195,7 +195,7 @@
   ],
   "schemaVersion": 1,
   "source": {
-    "commit": "865eea38f113dcab7c4a8b8728592dc017abcdd5",
+    "commit": "2b47edce0d8d3d255f375b3615f92793b79eed6e",
     "repository": "ga6es/desk-rules",
     "root": "packages/cli"
   }
