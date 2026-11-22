@@ -1,5 +1,7 @@
 # Troubleshooting
 
+For uncertain Semlens tool behavior, read its current capability, input schema and returned recovery instructions. For host, framework or provider behavior, identify the affected version, search the relevant official docs and open the page before proposing a workaround. Use supported CLI help or installed source when docs are inconclusive, and state what remains unverified. Keep private design/account data out of external searches. Additional reviews must address a concrete unresolved question or an explicit requirement.
+
 1. Inspect static capability, then live authorization. Inspect the Design Rule
    only when the workflow uses it.
 2. Follow the one returned recovery step: reinspect stale or unverifiable state,

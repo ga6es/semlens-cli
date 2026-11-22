@@ -22,10 +22,19 @@ set `activeWorkflow` to `image` for workspace drafts, then save with `expectedRe
 - Quote the exact available model and variant count, explain the credit cost,
   and obtain spending approval. Use returned references only. Local files use
   `semlens studio reference upload`; preserve request IDs.
-- Start with a stable `clientRequestId`. After uncertainty, inspect the same
-  run; do not create another paid request. Cancellation is a separate action:
-  `cancel_requested` is not final, and completed variants still spend credits.
-  Failed, blocked or canceled variants release their reservations.
+- Start with a stable `clientRequestId` and retain the exact submitted payload.
+  If the outcome is uncertain and you have the `runId`, call
+  `inspect_studio_generation` with it. If the first response was lost and you
+  have no `runId`, first call `inspect_studio_generation` with the original
+  `clientRequestId`. This read-only lookup does not admit generation or spend
+  credits. A `not_found` result or missing evidence does not authorize another
+  start, a replacement ID, or spending. Preserve the original ID and exact
+  submitted inputs while resolving the outcome. Any separately authorized
+  admission still requires current permissions, the exact payload and a current
+  quote covered by the original spending approval; otherwise preserve and stop.
+- Cancellation is a separate action. `cancel_requested` is still in progress,
+  and completed variants still spend credits. Failed, blocked or canceled
+  variants release their reservations.
 - Retrieve the matching owner-private PNG/JPEG/WebP with
   `retrieve_studio_output_content`; the authenticated CLI `mcp call` supports
   `--output-file` for durable delivery. Preserve output and history records.
