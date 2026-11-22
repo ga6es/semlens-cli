@@ -18,10 +18,10 @@ Use the hosted endpoint `https://agents.semlens.com/api/mcp`.
   and duplicate namespaces remain client-owned.
 - CLI auth and tool execution never bypass MCP account, owner, workflow,
   freshness, audit, billing, or provider checks.
-- Publishing connection setup and reconnection are currently unavailable.
-  Do not direct users to Apps or start a provider connection workflow. Preserve
-  completed work and stop when a connection is required. Existing ready
-  connections still require current authorization and specific publication approval.
+- Gallery and social publication through MCP, including connection setup and
+  reconnection, are unavailable. Do not direct users to Apps, start a provider
+  connection workflow, or treat an existing connection as publication support.
+  Preserve completed work and use supported private previews and downloads.
 
 ## Research
 
@@ -156,9 +156,9 @@ access even when cached. Status/cancel survive billing downgrade, with current
 authentication and applicable account permissions still enforced.
 
 Use the existing authenticated CLI `mcp call` with `--output-file` for completed
-private PNG/MP4 results. Descriptors are selectors, not public bearer URLs; never
-put credentials in tool JSON. Gallery PNG preview publication is a separate
-explicit operation, not social posting. See [native projects](playbooks/native-projects.md).
+private PNG/JPG/ZIP/MP4 results. Descriptors are selectors, not public bearer URLs;
+never put credentials in tool JSON. Gallery preview publication and social
+posting through MCP are unavailable. See [native projects](playbooks/native-projects.md).
 For narration/transcription, inspect availability and quote the exact input.
 Explain the returned credit cost and submit the unchanged quote only with
 spending approval, including an existing explicit budget covering that action

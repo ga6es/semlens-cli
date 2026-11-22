@@ -12,7 +12,9 @@ const MAX_INPUT_BYTES = 1024 * 1024
 const MAX_OUTPUT_BYTES = 1024 * 1024
 const MAX_RESULT_DEPTH = 12
 const MAX_RESULT_ITEMS = 200
+const MAX_IMAGE_PLAN_ITEMS = 256
 const MAX_CAPABILITY_PAGES = 10
+const EXACT_SOURCE_READS = new Set(["read_native_project_files", "read_native_project_sidecars", "read_native_project_source_range"])
 
 type ApprovalClass =
   | "approval_required_external_write"
@@ -126,6 +128,7 @@ export function sanitizeMachineValue(
   depth = 0,
   maximumDepth = MAX_RESULT_DEPTH,
   maximumStringLength = 16_000,
+  maximumItems = MAX_RESULT_ITEMS,
 ): unknown {
   if (depth >= maximumDepth) return "[truncated]"
   if (typeof value === "string") {
@@ -136,18 +139,18 @@ export function sanitizeMachineValue(
   }
   if (Array.isArray(value)) {
     return value
-      .slice(0, MAX_RESULT_ITEMS)
-      .map((item) => sanitizeMachineValue(item, depth + 1, maximumDepth, maximumStringLength))
+      .slice(0, maximumItems)
+      .map((item) => sanitizeMachineValue(item, depth + 1, maximumDepth, maximumStringLength, maximumItems))
   }
   if (!isRecord(value)) return null
   return Object.fromEntries(
     Object.entries(value)
-      .slice(0, MAX_RESULT_ITEMS)
+      .slice(0, maximumItems)
       .map(([key, item]) => [
         key,
         sensitiveKey(key)
           ? "[withheld]"
-          : sanitizeMachineValue(item, depth + 1, maximumDepth, maximumStringLength),
+          : sanitizeMachineValue(item, depth + 1, maximumDepth, maximumStringLength, maximumItems),
       ]),
   )
 }
@@ -173,12 +176,33 @@ function retainResearchFreshnessToken(
   }
 }
 
+function preservesSourceRead(raw: unknown, projected: unknown, toolName: string): boolean {
+  if (!isRecord(raw) || !isRecord(projected)) return false
+  if (toolName === "read_native_project_source_range") {
+    return typeof raw.content === "string" &&
+      ["path", "version", "start", "end", "nextStart", "content"].every(key => projected[key] === raw[key])
+  }
+  const files = projected.files
+  if (!Array.isArray(raw.files) || !Array.isArray(files) || files.length !== raw.files.length) return false
+  return raw.files.every((file, index) => {
+    const candidate = files[index]
+    return isRecord(file) && isRecord(candidate) && (typeof file.content === "string" || file.content === null) &&
+      ["path", "version", "byteSize", "content"].every(key => candidate[key] === file[key])
+  })
+}
+
+function preservesImageExportPlan(raw: unknown, projected: unknown) {
+  return isRecord(raw) && raw.kind === "native-image-export-plan" && isRecord(raw.plan) &&
+    JSON.stringify(raw) === JSON.stringify(projected)
+}
+
 function projectToolResult(result: CallToolResult, toolName: string) {
-  const maximumDepth = MAX_RESULT_DEPTH
+  const exactSource = EXACT_SOURCE_READS.has(toolName)
+  const exactImagePlan = toolName === "plan_native_project_image_export"
   const structured = retainResearchFreshnessToken(
     result.structuredContent,
-    sanitizeMachineValue(result.structuredContent, 0, maximumDepth,
-      ["read_native_project_files", "read_native_project_sidecars"].includes(toolName) ? 65_536 : 16_000),
+    sanitizeMachineValue(result.structuredContent, 0, MAX_RESULT_DEPTH, exactSource ? 65_536 : 16_000,
+      exactImagePlan ? MAX_IMAGE_PLAN_ITEMS : MAX_RESULT_ITEMS),
     toolName,
   )
   const contentTypes = result.content.map((item) => item.type)
@@ -188,9 +212,22 @@ function projectToolResult(result: CallToolResult, toolName: string) {
     structuredContent: structured,
     textContentOmitted: result.content.some((item) => item.type === "text"),
   }
-  const serialized = JSON.stringify(projected)
-  const maximumBytes = MAX_OUTPUT_BYTES
-  if (Buffer.byteLength(serialized, "utf8") > maximumBytes) {
+  const oversized = Buffer.byteLength(JSON.stringify(projected), "utf8") > MAX_OUTPUT_BYTES
+  if (exactSource && toolResultOk(result) && (oversized || !preservesSourceRead(result.structuredContent, structured, toolName))) {
+    return {
+      contentTypes,
+      isError: true,
+      structuredContent: { ok: false, code: "native_source_result_unavailable", reason: oversized ? "result_too_large" : "projection_changed" } as const,
+      textContentOmitted: true,
+    }
+  }
+  if (exactImagePlan && toolResultOk(result) && (oversized || !preservesImageExportPlan(result.structuredContent, structured))) {
+    return {
+      contentTypes, isError: true, textContentOmitted: true,
+      structuredContent: { ok: false, code: "native_image_export_plan_unavailable", reason: oversized ? "result_too_large" : "projection_changed" } as const,
+    }
+  }
+  if (oversized) {
     return {
       contentTypes,
       isError: result.isError === true,
@@ -372,14 +409,16 @@ export async function executeRegisteredTool(input: {
   getAccessToken?: () => Promise<string>
 }) {
   const { capability, result } = await executeRegisteredToolRaw(input)
-  const savedOutput = toolResultOk(result) ? await saveRequestedToolOutput(input, result) : {}
+  const output = projectToolResult(result, input.toolName)
+  const ok = toolResultOk(result) && !output.isError
+  const savedOutput = ok ? await saveRequestedToolOutput(input, result) : {}
   return {
     approvalClass: capability.approvalClass,
     ...savedOutput,
     manifestVersion: SEMLENS_MCP_SERVER_MANIFEST.manifestVersion,
-    ok: toolResultOk(result),
+    ok,
     operationId: input.toolName,
-    result: projectToolResult(result, input.toolName),
+    result: output,
   }
 }
 

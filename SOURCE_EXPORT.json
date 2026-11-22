@@ -42,7 +42,7 @@
     },
     {
       "path": "package-lock.json",
-      "sha256": "d55661f5670ac95eee97b348d18e24b356c460bc6b5081ca2a8fc2eca1f58710"
+      "sha256": "1502b6a60e8e5ada53604757ad868f1da6810aafa609e0b3b77f96ea0df8553b"
     },
     {
       "path": "package.json",
@@ -58,15 +58,15 @@
     },
     {
       "path": "package/README.md",
-      "sha256": "21c107d7b43cc5ebb847f7f152277e72ea37c494e6463c5ee8e1e9d520e13d6e"
+      "sha256": "e91cf9f517c40aed54b98f989d4d788f73a3abeddbb0f4a4e9c1c907cb4fd448"
     },
     {
       "path": "package/package.json",
-      "sha256": "9572494b92ff5845023ba0d552c1b8bf9dd6d843cb31a05c05caea3524b3f970"
+      "sha256": "62690533bb9c21e900cf223edaaaee6f6734cebc2aa45f7f424c7ff44e930c41"
     },
     {
       "path": "package/skills/semlens-mcp/SKILL.md",
-      "sha256": "f64332f1d7b8d32ff4b48285c182a80fd655ba53ca99342bbac7032869e5e5a8"
+      "sha256": "6b6b5cb6b15b401dc4feb7a194556bb63a95b3bdd4729c789e8361aab51fdcbe"
     },
     {
       "path": "package/skills/semlens-mcp/playbooks/first-safe-check.md",
@@ -74,11 +74,11 @@
     },
     {
       "path": "package/skills/semlens-mcp/playbooks/image-generation.md",
-      "sha256": "868f770742339f1e69f1aa720213dc2c3960fa0c218b874150fb3691e812b418"
+      "sha256": "23b93676ab460ed2c89fde74fab08d87505769442d3db6a174a47c1290f6c275"
     },
     {
       "path": "package/skills/semlens-mcp/playbooks/native-projects.md",
-      "sha256": "fe1cbc5f2335b726dd8726f3d4fe6ae1d595b4b4ddd2237887a5dc054a5d7233"
+      "sha256": "10181d48686d3d942d999bd5b7b37991e9835535c7732005fa3357bf47473def"
     },
     {
       "path": "package/skills/semlens-mcp/playbooks/research.md",
@@ -90,7 +90,7 @@
     },
     {
       "path": "package/skills/semlens-mcp/playbooks/troubleshooting.md",
-      "sha256": "a79c74108455c1fb6694defe52c00bb024b4e89c47dd20fe2600ba83894a72d2"
+      "sha256": "f013b6318f2092aa4fb588d00f9e429f21a330f1b8a81675042d75c8c526ceaa"
     },
     {
       "path": "package/src/codex-approval-policy.ts",
@@ -142,15 +142,15 @@
     },
     {
       "path": "package/src/operational-cli.ts",
-      "sha256": "7f7595ea02130d6dd581b268bd30fb4d8b280916e4a4da9d72ed31d7ee407ae3"
+      "sha256": "20a6944ed31b9c72286dec12041bc6a3c35cc71894a13b5e1a9d829d62e39fef"
     },
     {
       "path": "package/src/operational-mcp.ts",
-      "sha256": "867542bc8c8ce1717422cc57067e947b2571a8585c9db02ae4380bde08ee0f35"
+      "sha256": "e351a9faeadfb0fde2ae9fa349f757f573b5afef98f47dd3eca90cad53505286"
     },
     {
       "path": "package/src/public-compatibility.ts",
-      "sha256": "2c0edf220499d2d9ab725985eea5efcd02644282b3e72c28220761415f1571cb"
+      "sha256": "66ab4e581ae1b3a3dec52df7e8246ad2f0f2d0e7a29f24969554ae378563cd17"
     },
     {
       "path": "package/src/safe-mcp-url.ts",
@@ -166,7 +166,7 @@
     },
     {
       "path": "package/tsconfig.json",
-      "sha256": "d30981ea41a52829f5c4b403a2c14f80069b40eb9a8a701cc73eeb3f666e8531"
+      "sha256": "e700a31b9d284d3a5af12380a3a1c4b2d79bbd277721ef4b17ad31b4c33ec0e2"
     },
     {
       "path": "scripts/check-package.mjs",
@@ -195,7 +195,7 @@
   ],
   "schemaVersion": 1,
   "source": {
-    "commit": "2b47edce0d8d3d255f375b3615f92793b79eed6e",
+    "commit": "8ac7db41a156edac495061e52384a8d890984fde",
     "repository": "ga6es/desk-rules",
     "root": "packages/cli"
   }

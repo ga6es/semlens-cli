@@ -226,13 +226,21 @@ capabilities. Inspect the live capability manifest before requesting asset pixel
 
 ## Compatibility
 
-- Prepared Semlens CLI package version: `0.5.7` (publication pending)
-- Published CLI: `0.5.6`. The 0.5.7 candidate adds macOS credential-store routing and requires real-Mac verification plus separately approved trusted publication before normal npm installation.
+- Prepared Semlens CLI package version: `0.5.9` (publication pending)
+- Published CLI: `0.5.8`. The `0.5.9` candidate requires compatible hosted-server verification and separately approved public-source publication.
 - Historical Desk Rules package: `@desk-rules/cli` version `0.2.4`
 - Minimum compatible CLI contract: `0.5.0`
-- Current plugin and bundled skill contract: `0.5.1` (publication pending)
+- Prepared plugin and bundled skill contract: `0.5.2` (delivery pending; public distribution unverified)
 - Prepared MCP manifest: `2026-10-29.native-exports`
 - Protocol: MCP `2026-07-28` with automatic stateless legacy fallback
+
+The `0.5.9` candidate preserves complete supported source reads, range offsets,
+and 256-entry image-export plans, or returns an explicit unavailable result when
+redaction or size limits prevent exact delivery. Older CLI versions can report
+success after truncating or redacting those results. Do not construct source
+writes or exports from altered output. The minimum version above describes the
+base protocol contract; it does not prove these fidelity fixes are installed.
+Reconnecting or reinstalling published `0.5.8` cannot supply unpublished fixes.
 
 Run `mcp doctor` when a server, plugin, CLI, or skill bundle looks stale. The
 doctor distinguishes the installed bundle version from the minimum compatible
